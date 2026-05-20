@@ -5,7 +5,10 @@ import re
 from pathlib import Path
 from typing import Any
 
-from skill_router import resolve_skill
+try:
+    from .skill_router import resolve_skill
+except ImportError:
+    from skill_router import resolve_skill
 
 
 ALLOWED_VOICE_SKILL_IDS = {
@@ -147,12 +150,26 @@ def resolve_voice_intent(text: str, catalog_path: str | Path | None = None) -> d
     if any(normalize_voice_text(alias) in normalized for alias in IGNORED_TRANSCRIPT_ALIASES):
         return None
 
+    best_match: dict[str, Any] | None = None
+    best_score = (-1, -1)
     for skill_id, aliases in VOICE_INTENT_ALIASES.items():
-        if normalize_voice_text(skill_id) in normalized:
-            return {"id": skill_id, "name_zh": aliases[0], "aliases": aliases}
+        normalized_skill_id = normalize_voice_text(skill_id)
+        if normalized_skill_id in normalized:
+            exact = 1 if normalized_skill_id == normalized else 0
+            score = (exact, len(normalized_skill_id))
+            if score > best_score:
+                best_score = score
+                best_match = {"id": skill_id, "name_zh": aliases[0], "aliases": aliases}
         for alias in aliases:
-            if normalize_voice_text(alias) in normalized:
-                return {"id": skill_id, "name_zh": aliases[0], "aliases": aliases}
+            normalized_alias = normalize_voice_text(alias)
+            if normalized_alias in normalized:
+                exact = 1 if normalized_alias == normalized else 0
+                score = (exact, len(normalized_alias))
+                if score > best_score:
+                    best_score = score
+                    best_match = {"id": skill_id, "name_zh": aliases[0], "aliases": aliases}
+    if best_match:
+        return best_match
 
     if not catalog_path:
         return None

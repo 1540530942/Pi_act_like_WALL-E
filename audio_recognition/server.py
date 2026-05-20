@@ -18,9 +18,12 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from face_router import create_face_task, is_face_skill
-from skill_router import create_action_task
-from voice_intents import resolve_voice_intent
+try:
+    from .intermediate_store import append_case, build_case_id, copy_audio_file, find_case, load_cases, write_audio_bytes
+    from .pipeline import route_transcript
+except ImportError:
+    from intermediate_store import append_case, build_case_id, copy_audio_file, find_case, load_cases, write_audio_bytes
+    from pipeline import route_transcript
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -82,6 +85,13 @@ class TextCommand(BaseModel):
     raw: dict[str, Any] = Field(default_factory=dict)
 
 
+class SimulationCommand(BaseModel):
+    device_id: str = Field("offline-sim", max_length=80)
+    text: str = Field(..., max_length=2000)
+    source: str = Field("offline-simulation", max_length=80)
+    raw: dict[str, Any] = Field(default_factory=dict)
+
+
 class AudioSettings(BaseModel):
     input_mode: str = Field("wonderechopro", pattern="^(web_input|wonderechopro)$")
     manual_recording_enabled: bool = False
@@ -91,6 +101,23 @@ DEFAULT_SETTINGS = {
     "input_mode": "wonderechopro",
     "manual_recording_enabled": False,
 }
+
+
+def build_router_config() -> dict[str, Any]:
+    mode = str(os.getenv("AUDIO_TASK_PLANNER_MODE", "rule") or "rule").strip().lower()
+    config: dict[str, Any] = {"skill_catalog": str(ACTION_CATALOG_PATH)}
+    planner: dict[str, Any] = {"mode": mode}
+    llm = {
+        "endpoint": str(os.getenv("AUDIO_TASK_PLANNER_LLM_ENDPOINT", "")).strip(),
+        "model": str(os.getenv("AUDIO_TASK_PLANNER_LLM_MODEL", "")).strip(),
+        "api_key": str(os.getenv("AUDIO_TASK_PLANNER_LLM_API_KEY", "")).strip(),
+        "api_key_env": str(os.getenv("AUDIO_TASK_PLANNER_LLM_API_KEY_ENV", "")).strip(),
+        "timeout_seconds": float(os.getenv("AUDIO_TASK_PLANNER_LLM_TIMEOUT_SECONDS", "30") or 30),
+    }
+    if any(llm.values()):
+        planner["llm"] = llm
+    config["planner"] = planner
+    return config
 
 
 def expected_token() -> str:
@@ -227,8 +254,104 @@ def save_embedded_audio(payload: dict[str, Any]) -> tuple[str, float]:
     return payload["audio_url"], duration
 
 
-def resolve_audio_intent(text: str) -> dict[str, Any] | None:
-    return resolve_voice_intent(text, ACTION_CATALOG_PATH)
+def local_audio_path_from_url(audio_url: str) -> Path | None:
+    prefix = "/audio/api/audio/"
+    if not audio_url.startswith(prefix):
+        return None
+    target = (UPLOADS_DIR / Path(audio_url.removeprefix(prefix)).name).resolve()
+    if target.parent != UPLOADS_DIR.resolve() or not target.exists():
+        return None
+    return target
+
+
+def record_intermediate_case(
+    *,
+    source: str,
+    device_id: str,
+    text: str = "",
+    wav_path: str = "",
+    audio_url: str = "",
+    audio_info: dict[str, Any] | None = None,
+    raw_asr: dict[str, Any] | None = None,
+    routed: dict[str, Any] | None = None,
+    result: dict[str, Any] | None = None,
+    route_action: bool = False,
+    notes: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    case_id = build_case_id("audio")
+    audio = dict(audio_info or {})
+    source_path = Path(wav_path) if wav_path else None
+    if not audio and source_path and source_path.exists():
+        audio = copy_audio_file(data_dir=DATA_DIR, case_id=case_id, source_path=source_path)
+    if not audio and audio_url:
+        local_audio = local_audio_path_from_url(audio_url)
+        if local_audio:
+            audio = copy_audio_file(data_dir=DATA_DIR, case_id=case_id, source_path=local_audio)
+    if not audio and not raw_asr:
+        return {}
+    result_meta = {}
+    if result:
+        result_meta = {
+            "device_id": result.get("device_id", ""),
+            "text": result.get("text", ""),
+            "wav_path": result.get("wav_path", ""),
+            "skill_id": result.get("skill_id", ""),
+            "audio_url": result.get("audio_url", ""),
+            "audio_duration_seconds": result.get("audio_duration_seconds", 0.0),
+            "reported_at": result.get("reported_at", 0.0),
+        }
+    item = {
+        "case_id": case_id,
+        "source": source,
+        "device_id": device_id,
+        "text": text,
+        "wav_path": wav_path,
+        "audio_url": audio_url,
+        "audio": audio,
+        "raw_asr": raw_asr or {},
+        "plan": (routed or {}).get("plan"),
+        "skill_id": str((routed or {}).get("skill_id") or (result or {}).get("skill_id") or ""),
+        "route_action": route_action,
+        "action_task": (routed or {}).get("action_task"),
+        "action_error": (routed or {}).get("action_error", ""),
+        "face_task": (routed or {}).get("face_task"),
+        "face_error": (routed or {}).get("face_error", ""),
+        "result": result_meta,
+        "notes": notes or {},
+    }
+    return append_case(DATA_DIR, item)
+
+
+def simulate_route_text(*, text: str, device_id: str, source: str, raw: dict[str, Any] | None = None) -> dict[str, Any]:
+    routed = route_transcript(
+        base_dir=BASE_DIR,
+        text=text,
+        router_config=build_router_config(),
+        cloud_config={
+            "face_server": FACE_SERVER,
+            "face_enabled": True,
+            "action_server": ACTION_SERVER,
+            "action_enabled": True,
+        },
+        route_action=False,
+        source=source,
+    )
+    return {
+        "ok": True,
+        "simulation": {
+            "source": source,
+            "device_id": device_id,
+            "text": text,
+            "dispatch": "disabled",
+            "raw": raw or {},
+        },
+        "skill": {"id": routed["skill_id"]} if routed.get("skill_id") else None,
+        "plan": routed.get("plan"),
+        "action_task": None,
+        "action_error": "",
+        "face_task": None,
+        "face_error": "",
+    }
 
 
 def fetch_json(url: str) -> dict[str, Any]:
@@ -322,6 +445,7 @@ def health() -> dict[str, Any]:
         "latest": latest,
         "latest_event": latest_event,
         "age_seconds": age,
+        "planner": build_router_config().get("planner", {}),
     }
 
 
@@ -344,6 +468,7 @@ def dashboard() -> dict[str, Any]:
         "action": action_snapshot(),
         "camera": camera_snapshot(),
         "settings": load_settings(),
+        "planner": build_router_config().get("planner", {}),
         "server_time": time.time(),
     }
 
@@ -460,45 +585,114 @@ def list_events() -> dict[str, Any]:
     return {"events": list(reversed(load_events()))}
 
 
+@app.get("/api/intermediate/cases")
+def list_intermediate_cases(limit: int = 50) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 500))
+    return {"cases": list(reversed(load_cases(DATA_DIR, limit=safe_limit)))}
+
+
+@app.get("/api/intermediate/cases/{case_id}")
+def get_intermediate_case(case_id: str) -> dict[str, Any]:
+    item = find_case(DATA_DIR, case_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="case not found")
+    return {"case": item}
+
+
+@app.post("/api/simulate/text")
+def simulate_text(payload: SimulationCommand) -> dict[str, Any]:
+    text = payload.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="empty simulation text")
+    return simulate_route_text(text=text, device_id=payload.device_id, source=payload.source, raw=payload.raw)
+
+
+@app.post("/api/intermediate/cases/{case_id}/replay")
+def replay_intermediate_case(case_id: str) -> dict[str, Any]:
+    item = find_case(DATA_DIR, case_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="case not found")
+    text = str(item.get("text") or "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="case has no recognized text to replay")
+    raw_asr = item.get("raw_asr") if isinstance(item.get("raw_asr"), dict) else {}
+    return simulate_route_text(text=text, device_id=str(item.get("device_id") or "offline-sim"), source="case-replay", raw=raw_asr)
+
+
 @app.post("/api/results")
 def add_result(payload: AudioResult, x_audio_token: Annotated[str | None, Header()] = None) -> dict[str, Any]:
     require_token(x_audio_token)
     item = payload.model_dump() if hasattr(payload, "model_dump") else payload.dict()
     text = str(item.get("text") or "").strip()
-    skill = resolve_audio_intent(text) if text and text != "noise_or_unrecognized_audio" else None
-    face_task: dict[str, Any] | None = None
-    face_error = ""
-    if skill and is_face_skill(skill["id"]):
-        item["skill_id"] = skill["id"]
-        try:
-            face_task = create_face_task(FACE_SERVER, skill["id"], text, source="audio_result")
-            append_event(
-                {
-                    "device_id": item.get("device_id") or "turbopi-01",
-                    "stage": "face_route",
-                    "status": "ok",
-                    "message": f"routed result to face {skill['id']}",
-                    "details": {"state": face_task.get("state", face_task)},
-                    "reported_at": time.time(),
-                }
-            )
-        except Exception as exc:  # noqa: BLE001 - keep uploaded result even if display route fails
-            face_error = str(exc)
-            append_event(
-                {
-                    "device_id": item.get("device_id") or "turbopi-01",
-                    "stage": "face_route",
-                    "status": "failed",
-                    "message": face_error,
-                    "details": {"skill_id": skill["id"]},
-                    "reported_at": time.time(),
-                }
-            )
-        raw = item.get("raw") if isinstance(item.get("raw"), dict) else {}
-        item["raw"] = {**raw, "face_task": face_task, "face_error": face_error}
+    routed = route_transcript(
+        base_dir=BASE_DIR,
+        text=text,
+        router_config=build_router_config(),
+        cloud_config={
+            "face_server": FACE_SERVER,
+            "face_enabled": True,
+            "action_server": ACTION_SERVER,
+            "action_enabled": True,
+        },
+        route_action=text != "noise_or_unrecognized_audio",
+        source="audio_result",
+    )
+    plan = routed.get("plan")
+    if routed.get("skill_id"):
+        item["skill_id"] = str(routed["skill_id"])
+    raw = item.get("raw") if isinstance(item.get("raw"), dict) else {}
+    item["raw"] = {
+        **raw,
+        "plan": plan,
+        "action_task": routed.get("action_task"),
+        "action_error": routed.get("action_error", ""),
+        "face_task": routed.get("face_task"),
+        "face_error": routed.get("face_error", ""),
+    }
+    if routed.get("face_task"):
+        append_event(
+            {
+                "device_id": item.get("device_id") or "turbopi-01",
+                "stage": "face_route",
+                "status": "ok",
+                "message": f"routed result to face {routed['skill_id']}",
+                "details": {"state": routed["face_task"].get("state", routed["face_task"]), "plan": plan},
+                "reported_at": time.time(),
+            }
+        )
+    if routed.get("face_error"):
+        append_event(
+            {
+                "device_id": item.get("device_id") or "turbopi-01",
+                "stage": "face_route",
+                "status": "failed",
+                "message": str(routed["face_error"]),
+                "details": {"skill_id": routed.get("skill_id", ""), "plan": plan},
+                "reported_at": time.time(),
+            }
+        )
     save_embedded_audio(item)
     append_result(item)
-    return {"ok": True, "result": item, "skill": skill, "face_task": face_task, "face_error": face_error}
+    case = record_intermediate_case(
+        source="audio_result",
+        device_id=str(item.get("device_id") or "turbopi-01"),
+        text=text,
+        wav_path=str(item.get("wav_path") or ""),
+        audio_url=str(item.get("audio_url") or ""),
+        raw_asr=raw.get("asr") if isinstance(raw.get("asr"), dict) else raw,
+        routed=routed,
+        result=item,
+        route_action=text != "noise_or_unrecognized_audio",
+    )
+    return {
+        "ok": True,
+        "result": item,
+        "case_id": case.get("case_id", ""),
+        "skill": {"id": routed["skill_id"]} if routed.get("skill_id") else None,
+        "face_task": routed.get("face_task"),
+        "face_error": routed.get("face_error", ""),
+        "plan": plan,
+    }
 
 
 @app.post("/api/events")
@@ -518,6 +712,14 @@ async def proxy_asr_transcribe(
     if not content:
         raise HTTPException(status_code=400, detail="empty audio file")
 
+    case_id = build_case_id("audio-asr")
+    audio_info = write_audio_bytes(
+        data_dir=DATA_DIR,
+        case_id=case_id,
+        content=content,
+        original_filename=file.filename or "recording.wav",
+        content_type=file.content_type or "audio/wav",
+    )
     endpoint = COMMON_ASR_URL
     data = {"language": language or "zh"}
     files = {"file": (file.filename or "recording.wav", content, file.content_type or "audio/wav")}
@@ -526,6 +728,28 @@ async def proxy_asr_transcribe(
         response.raise_for_status()
         payload = response.json()
     except requests.RequestException as exc:
+        append_case(
+            DATA_DIR,
+            {
+                "case_id": case_id,
+                "source": "web-asr",
+                "device_id": "web-audio",
+                "text": "",
+                "wav_path": "",
+                "audio_url": "",
+                "audio": audio_info,
+                "raw_asr": {},
+                "plan": None,
+                "skill_id": "",
+                "route_action": False,
+                "action_task": None,
+                "action_error": "",
+                "face_task": None,
+                "face_error": "",
+                "result": {},
+                "notes": {"language": language or "zh", "endpoint": endpoint, "error": str(exc)},
+            },
+        )
         append_event(
             {
                 "device_id": "web-audio",
@@ -538,10 +762,56 @@ async def proxy_asr_transcribe(
         )
         raise HTTPException(status_code=502, detail=f"ASR proxy failed: {exc}") from exc
     except ValueError as exc:
+        append_case(
+            DATA_DIR,
+            {
+                "case_id": case_id,
+                "source": "web-asr",
+                "device_id": "web-audio",
+                "text": "",
+                "wav_path": "",
+                "audio_url": "",
+                "audio": audio_info,
+                "raw_asr": {},
+                "plan": None,
+                "skill_id": "",
+                "route_action": False,
+                "action_task": None,
+                "action_error": "",
+                "face_task": None,
+                "face_error": "",
+                "result": {},
+                "notes": {"language": language or "zh", "endpoint": endpoint, "error": "non-json ASR response"},
+            },
+        )
         raise HTTPException(status_code=502, detail="ASR provider returned non-JSON response") from exc
 
     payload.setdefault("provider", "common_api")
     payload.setdefault("endpoint", endpoint)
+    text = str(payload.get("text") or "").strip()
+    case = append_case(
+        DATA_DIR,
+        {
+            "case_id": case_id,
+            "source": "web-asr",
+            "device_id": "web-audio",
+            "text": text,
+            "wav_path": "",
+            "audio_url": "",
+            "audio": audio_info,
+            "raw_asr": payload,
+            "plan": None,
+            "skill_id": "",
+            "route_action": False,
+            "action_task": None,
+            "action_error": "",
+            "face_task": None,
+            "face_error": "",
+            "result": {},
+            "notes": {"language": language or "zh", "endpoint": endpoint},
+        },
+    )
+    payload.setdefault("case_id", case["case_id"])
     return payload
 
 
@@ -563,71 +833,73 @@ def recognize_text(payload: TextCommand, x_audio_token: Annotated[str | None, He
         }
     )
 
-    skill = resolve_audio_intent(text)
-    action_task: dict[str, Any] | None = None
-    face_task: dict[str, Any] | None = None
-    action_error = ""
-    face_error = ""
-    if skill and payload.route_action:
-        skill_id = skill["id"]
-        if is_face_skill(skill_id):
-            try:
-                face_task = create_face_task(FACE_SERVER, skill_id, text, source="audio_recognition")
-                append_event(
-                    {
-                        "device_id": payload.device_id,
-                        "stage": "face_route",
-                        "status": "ok",
-                        "message": f"routed text to face {skill_id}",
-                        "details": {"state": face_task.get("state", face_task)},
-                        "reported_at": time.time(),
-                    }
-                )
-            except Exception as exc:  # noqa: BLE001 - surface routing failure in UI
-                face_error = str(exc)
-                append_event(
-                    {
-                        "device_id": payload.device_id,
-                        "stage": "face_route",
-                        "status": "failed",
-                        "message": face_error,
-                        "details": {"skill_id": skill_id},
-                        "reported_at": time.time(),
-                    }
-                )
-        else:
-            try:
-                action_task = create_action_task(ACTION_SERVER, skill_id, source="audio_recognition")
-                append_event(
-                    {
-                        "device_id": payload.device_id,
-                        "stage": "action_route",
-                        "status": "ok",
-                        "message": f"routed text to action {skill_id}",
-                        "details": {"task": action_task.get("task", action_task)},
-                        "reported_at": time.time(),
-                    }
-                )
-            except Exception as exc:  # noqa: BLE001 - surface routing failure in UI
-                action_error = str(exc)
-                append_event(
-                    {
-                        "device_id": payload.device_id,
-                        "stage": "action_route",
-                        "status": "failed",
-                        "message": action_error,
-                        "details": {"skill_id": skill_id},
-                        "reported_at": time.time(),
-                    }
-                )
-    elif not skill:
+    routed = route_transcript(
+        base_dir=BASE_DIR,
+        text=text,
+        router_config=build_router_config(),
+        cloud_config={
+            "face_server": FACE_SERVER,
+            "face_enabled": True,
+            "action_server": ACTION_SERVER,
+            "action_enabled": True,
+        },
+        route_action=payload.route_action,
+        source="audio_recognition",
+    )
+    skill_id = str(routed.get("skill_id") or "")
+    plan = routed.get("plan")
+    if not skill_id:
         append_event(
             {
                 "device_id": payload.device_id,
                 "stage": "skill_route",
                 "status": "skipped",
                 "message": "no matching voice skill",
-                "details": {"text": text},
+                "details": {"text": text, "plan": plan},
+                "reported_at": time.time(),
+            }
+        )
+    elif routed.get("face_task"):
+        append_event(
+            {
+                "device_id": payload.device_id,
+                "stage": "face_route",
+                "status": "ok",
+                "message": f"routed text to face {skill_id}",
+                "details": {"state": routed["face_task"].get("state", routed["face_task"]), "plan": plan},
+                "reported_at": time.time(),
+            }
+        )
+    elif routed.get("face_error"):
+        append_event(
+            {
+                "device_id": payload.device_id,
+                "stage": "face_route",
+                "status": "failed",
+                "message": str(routed["face_error"]),
+                "details": {"skill_id": skill_id, "plan": plan},
+                "reported_at": time.time(),
+            }
+        )
+    elif routed.get("action_task"):
+        append_event(
+            {
+                "device_id": payload.device_id,
+                "stage": "action_route",
+                "status": "ok",
+                "message": f"routed text to action {skill_id}",
+                "details": {"task": routed["action_task"].get("task", routed["action_task"]), "plan": plan},
+                "reported_at": time.time(),
+            }
+        )
+    elif routed.get("action_error"):
+        append_event(
+            {
+                "device_id": payload.device_id,
+                "stage": "action_route",
+                "status": "failed",
+                "message": str(routed["action_error"]),
+                "details": {"skill_id": skill_id, "plan": plan},
                 "reported_at": time.time(),
             }
         )
@@ -637,24 +909,38 @@ def recognize_text(payload: TextCommand, x_audio_token: Annotated[str | None, He
             "device_id": payload.device_id,
             "text": text,
             "wav_path": payload.wav_path,
-            "skill_id": skill["id"] if skill else "",
+            "skill_id": skill_id,
             "raw": {
                 **payload.raw,
                 "source": payload.source,
-                "action_task": action_task,
-                "action_error": action_error,
-                "face_task": face_task,
-                "face_error": face_error,
+                "plan": plan,
+                "action_task": routed.get("action_task"),
+                "action_error": routed.get("action_error", ""),
+                "face_task": routed.get("face_task"),
+                "face_error": routed.get("face_error", ""),
             },
             "reported_at": time.time(),
         }
     )
+    raw_asr = payload.raw.get("asr") if isinstance(payload.raw.get("asr"), dict) else payload.raw
+    case = record_intermediate_case(
+        source=payload.source,
+        device_id=payload.device_id,
+        text=text,
+        wav_path=payload.wav_path,
+        raw_asr=raw_asr,
+        routed=routed,
+        result=result,
+        route_action=payload.route_action,
+    )
     return {
         "ok": True,
         "result": result,
-        "skill": skill,
-        "action_task": action_task,
-        "action_error": action_error,
-        "face_task": face_task,
-        "face_error": face_error,
+        "case_id": case.get("case_id", ""),
+        "skill": {"id": skill_id} if skill_id else None,
+        "action_task": routed.get("action_task"),
+        "action_error": routed.get("action_error", ""),
+        "face_task": routed.get("face_task"),
+        "face_error": routed.get("face_error", ""),
+        "plan": plan,
     }

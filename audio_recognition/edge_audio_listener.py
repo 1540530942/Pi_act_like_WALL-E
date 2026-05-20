@@ -10,11 +10,14 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from face_router import create_face_task, is_face_skill
-from model_provider import build_provider
-from recorder import record_wav
-from skill_router import create_action_task
-from voice_intents import resolve_voice_intent
+try:
+    from .model_provider import build_provider
+    from .pipeline import route_transcript, transcribe_audio_path
+    from .recorder import record_wav
+except ImportError:
+    from model_provider import build_provider
+    from pipeline import route_transcript, transcribe_audio_path
+    from recorder import record_wav
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -125,9 +128,15 @@ def process_wav(config: dict[str, Any], wav_path: str | Path) -> dict[str, Any]:
     device_id = str(config.get("device_id") or "turbopi-01")
     wav_path = Path(wav_path)
     provider_config = dict(config.get("model_provider", {}))
+    provider = build_provider(provider_config)
     try:
-        result = build_provider(provider_config).transcribe(wav_path)
-        asr_error = str(result.get("error") or "")
+        routed_audio = transcribe_audio_path(
+            base_dir=BASE_DIR,
+            wav_path=wav_path,
+            provider=provider,
+            router_config=config.get("router", {}),
+        )
+        asr_error = str(routed_audio.get("error") or "")
         post_pipeline_event(
             audio_server,
             audio_token,
@@ -135,10 +144,10 @@ def process_wav(config: dict[str, Any], wav_path: str | Path) -> dict[str, Any]:
             "model_asr",
             "ok" if not asr_error else "empty",
             "model returned real transcript" if not asr_error else "model returned no transcript",
-            {"text": result.get("text", ""), "error": asr_error, "asr_provider": "common_api"},
+            {"text": routed_audio.get("text", ""), "error": asr_error, "asr_provider": "common_api", "plan": routed_audio.get("plan")},
         )
     except Exception as exc:  # noqa: BLE001 - report real captured audio even if ASR fails
-        result = {"text": "", "raw": {}, "error": str(exc)}
+        routed_audio = {"text": "", "raw": {}, "error": str(exc), "skill_id": "", "plan": None}
         post_pipeline_event(
             audio_server,
             audio_token,
@@ -149,26 +158,35 @@ def process_wav(config: dict[str, Any], wav_path: str | Path) -> dict[str, Any]:
             {"wav_path": str(wav_path), "asr_provider": "common_api"},
         )
 
-    text = str(result.get("text") or "")
-    router = config.get("router", {})
-    catalog_path = Path(str(router.get("skill_catalog") or "../action_move/skill_catalog.json"))
-    if not catalog_path.is_absolute():
-        catalog_path = (BASE_DIR / catalog_path).resolve()
-    skill = resolve_voice_intent(text, catalog_path) if text else None
+    text = str(routed_audio.get("text") or "")
+    plan = routed_audio.get("plan")
+    routed = route_transcript(
+        base_dir=BASE_DIR,
+        text=text,
+        router_config=config.get("router", {}),
+        cloud_config=cloud,
+        route_action=False,
+        source="edge_audio_listener",
+    )
 
     payload = {
         "device_id": device_id,
         "text": text or "noise_or_unrecognized_audio",
         "wav_path": str(wav_path),
-        "skill_id": skill["id"] if skill else "",
+        "skill_id": str(routed.get("skill_id") or ""),
         "audio_base64": base64.b64encode(wav_path.read_bytes()).decode("ascii"),
         "audio_mime": "audio/wav",
         "audio_filename": wav_path.name,
         "raw": {
-            "asr": result.get("raw", {}),
-            "asr_error": result.get("error", ""),
+            "asr": routed_audio.get("raw", {}),
+            "asr_error": routed_audio.get("error", ""),
             "captured_audio": True,
             "recognized": bool(text),
+            "plan": plan,
+            "action_task": routed.get("action_task"),
+            "action_error": routed.get("action_error", ""),
+            "face_task": routed.get("face_task"),
+            "face_error": routed.get("face_error", ""),
         },
         "reported_at": time.time(),
     }
@@ -180,16 +198,8 @@ def process_wav(config: dict[str, Any], wav_path: str | Path) -> dict[str, Any]:
         "text_display",
         "ok",
         "recognized text uploaded",
-        {"text": text, "skill_id": payload["skill_id"]},
+        {"text": text, "skill_id": payload["skill_id"], "plan": plan},
     )
-
-    if skill:
-        skill_id = skill["id"]
-        if is_face_skill(skill_id):
-            if bool(cloud.get("face_enabled", True)):
-                create_face_task(str(cloud.get("face_server") or "https://www.wangyutang.cn/face"), skill_id, text, source="edge_audio_listener")
-        elif bool(cloud.get("action_enabled")):
-            create_action_task(str(cloud.get("action_server") or ""), skill_id)
     return payload
 
 

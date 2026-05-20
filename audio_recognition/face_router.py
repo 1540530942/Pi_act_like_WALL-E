@@ -4,7 +4,10 @@ import json
 import urllib.request
 from typing import Any
 
-from skill_router import is_loopback_url
+try:
+    from .skill_router import is_loopback_url
+except ImportError:
+    from skill_router import is_loopback_url
 
 
 FACE_EMOTIONS = {

@@ -37,6 +37,16 @@
   },
   "router": {
     "skill_catalog": "../action_move/skill_catalog.json",
-    "min_confidence": 0.65
+    "min_confidence": 0.65,
+    "planner": {
+      "mode": "rule",
+      "llm": {
+        "endpoint": "",
+        "model": "",
+        "api_key": "",
+        "api_key_env": "",
+        "timeout_seconds": 30
+      }
+    }
   }
 }

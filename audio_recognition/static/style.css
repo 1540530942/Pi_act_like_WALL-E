@@ -460,7 +460,7 @@ pre {
 .danger-row,
 .task-failed,
 .task-rejected,
-event-failed {
+.event-failed {
   border-color: #e2b7b3;
   background: #fff6f5;
 }
