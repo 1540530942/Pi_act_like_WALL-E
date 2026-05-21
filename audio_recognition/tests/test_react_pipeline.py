@@ -98,6 +98,27 @@ class ReactPipelineTest(unittest.TestCase):
         create_action_task.assert_called_once()
         self.assertEqual(envelope.dispatch_results[0]["status"], "completed")
 
+    def test_local_first_dispatch_posts_to_edge_controller(self) -> None:
+        envelope = decide_transcript(
+            base_dir=BASE_DIR,
+            text="前进",
+            router_config=ROUTER_CONFIG,
+            cloud_config={},
+            dispatch_mode="dry_run",
+            source="unit",
+        )
+        envelope.dispatch_results = []
+        with patch("audio_recognition.dispatcher._post_json", return_value={"ok": True, "skill_id": "move_forward"}) as post_json:
+            envelope = dispatch_envelope(
+                envelope,
+                cloud_config={"local_action_server": "http://127.0.0.1:8765", "local_settings": {"unit_distance_cm": 1}},
+                source="unit",
+                dispatch_mode="local_first",
+            )
+        post_json.assert_called_once()
+        self.assertTrue(post_json.call_args.args[0].endswith("/execute"))
+        self.assertEqual(envelope.dispatch_results[0]["status"], "completed")
+
     def test_route_transcript_keeps_legacy_shape_with_envelope(self) -> None:
         routed = route_transcript(
             base_dir=BASE_DIR,

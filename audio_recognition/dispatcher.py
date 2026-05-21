@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import time
+import json
+import urllib.request
 from typing import Any
 
 try:
@@ -15,6 +17,24 @@ except ImportError:
 
 def _planned_from_task(task: TaskStep) -> PlannedTask:
     return PlannedTask(skill_id=task.skill_id, route="face" if task.route == "face" else "action", transcript="", metadata={"task_id": task.task_id})
+
+
+def _post_json(url: str, payload: dict[str, Any], timeout: float = 12) -> dict[str, Any]:
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def _execute_local_action(task: TaskStep, cloud_config: dict[str, Any] | None) -> dict[str, Any]:
+    cloud_config = cloud_config or {}
+    action_server = str(cloud_config.get("local_action_server") or cloud_config.get("action_server") or "").rstrip("/")
+    if not action_server:
+        raise RuntimeError("local action_server is required")
+    settings = dict(cloud_config.get("local_settings") or {})
+    if task.duration_ms is not None:
+        settings["requested_duration_ms"] = task.duration_ms
+    return _post_json(f"{action_server}/execute", {"action": task.skill_id, "settings": settings})
 
 
 def dispatch_envelope(
@@ -37,7 +57,14 @@ def dispatch_envelope(
             results.append({"task_id": task.task_id, "skill_id": task.skill_id, "status": "dry_run", "result": task.result})
             continue
         task.status = "running"
-        execution = execute_planned_task(_planned_from_task(task), envelope.transcript, cloud_config, source)
+        if envelope.dispatch_mode == "local_first" and task.route == "action":
+            try:
+                local_result = _execute_local_action(task, cloud_config)
+                execution = {"action_task": local_result, "face_task": None, "action_error": "" if local_result.get("ok", True) else str(local_result.get("error", "")), "face_error": ""}
+            except Exception as exc:  # noqa: BLE001
+                execution = {"action_task": None, "face_task": None, "action_error": str(exc), "face_error": ""}
+        else:
+            execution = execute_planned_task(_planned_from_task(task), envelope.transcript, cloud_config, source)
         if execution.get("action_error") or execution.get("face_error"):
             task.status = "failed"
             task.error = str(execution.get("action_error") or execution.get("face_error") or "")
