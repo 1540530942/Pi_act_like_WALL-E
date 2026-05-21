@@ -19,10 +19,16 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 try:
+    from .envelope import DecisionEnvelope
+    from .envelope_store import list_envelopes, load_envelope, save_envelope
     from .intermediate_store import append_case, build_case_id, copy_audio_file, find_case, load_cases, write_audio_bytes
+    from .replay import replay_envelope
     from .pipeline import route_transcript
 except ImportError:
+    from envelope import DecisionEnvelope
+    from envelope_store import list_envelopes, load_envelope, save_envelope
     from intermediate_store import append_case, build_case_id, copy_audio_file, find_case, load_cases, write_audio_bytes
+    from replay import replay_envelope
     from pipeline import route_transcript
 
 
@@ -302,6 +308,7 @@ def record_intermediate_case(
         }
     item = {
         "case_id": case_id,
+        "envelope_id": str((routed or {}).get("envelope", {}).get("envelope_id", "")),
         "source": source,
         "device_id": device_id,
         "text": text,
@@ -335,6 +342,7 @@ def simulate_route_text(*, text: str, device_id: str, source: str, raw: dict[str
         },
         route_action=False,
         source=source,
+        device_id=device_id,
     )
     return {
         "ok": True,
@@ -347,6 +355,7 @@ def simulate_route_text(*, text: str, device_id: str, source: str, raw: dict[str
         },
         "skill": {"id": routed["skill_id"]} if routed.get("skill_id") else None,
         "plan": routed.get("plan"),
+        "envelope": routed.get("envelope"),
         "action_task": None,
         "action_error": "",
         "face_task": None,
@@ -599,6 +608,20 @@ def get_intermediate_case(case_id: str) -> dict[str, Any]:
     return {"case": item}
 
 
+@app.get("/api/envelopes")
+def api_list_envelopes(limit: int = 50) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 500))
+    return {"envelopes": list(reversed(list_envelopes(DATA_DIR, limit=safe_limit)))}
+
+
+@app.get("/api/envelopes/{envelope_id}")
+def api_get_envelope(envelope_id: str) -> dict[str, Any]:
+    envelope = load_envelope(DATA_DIR, envelope_id)
+    if not envelope:
+        raise HTTPException(status_code=404, detail="envelope not found")
+    return {"envelope": envelope.model_dump()}
+
+
 @app.post("/api/simulate/text")
 def simulate_text(payload: SimulationCommand) -> dict[str, Any]:
     text = payload.text.strip()
@@ -619,6 +642,22 @@ def replay_intermediate_case(case_id: str) -> dict[str, Any]:
     return simulate_route_text(text=text, device_id=str(item.get("device_id") or "offline-sim"), source="case-replay", raw=raw_asr)
 
 
+@app.post("/api/envelopes/{envelope_id}/replay")
+def api_replay_envelope(envelope_id: str, replay_from: str = "text") -> dict[str, Any]:
+    if replay_from not in {"text", "tool_calls", "tasks"}:
+        raise HTTPException(status_code=400, detail="replay_from must be one of text/tool_calls/tasks")
+    try:
+        return replay_envelope(
+            data_dir=DATA_DIR,
+            envelope_id=envelope_id,
+            base_dir=BASE_DIR,
+            router_config=build_router_config(),
+            replay_from=replay_from,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="envelope not found") from exc
+
+
 @app.post("/api/results")
 def add_result(payload: AudioResult, x_audio_token: Annotated[str | None, Header()] = None) -> dict[str, Any]:
     require_token(x_audio_token)
@@ -636,6 +675,7 @@ def add_result(payload: AudioResult, x_audio_token: Annotated[str | None, Header
         },
         route_action=text != "noise_or_unrecognized_audio",
         source="audio_result",
+        device_id=str(item.get("device_id") or "turbopi-01"),
     )
     plan = routed.get("plan")
     if routed.get("skill_id"):
@@ -673,6 +713,8 @@ def add_result(payload: AudioResult, x_audio_token: Annotated[str | None, Header
         )
     save_embedded_audio(item)
     append_result(item)
+    if isinstance(routed.get("envelope"), dict):
+        save_envelope(DATA_DIR, DecisionEnvelope(**routed["envelope"]))
     case = record_intermediate_case(
         source="audio_result",
         device_id=str(item.get("device_id") or "turbopi-01"),
@@ -789,6 +831,18 @@ async def proxy_asr_transcribe(
     payload.setdefault("provider", "common_api")
     payload.setdefault("endpoint", endpoint)
     text = str(payload.get("text") or "").strip()
+    save_envelope(
+        DATA_DIR,
+        DecisionEnvelope(
+            device_id="web-audio",
+            source="web-asr",
+            transcript=text,
+            audio_ref=audio_info.get("audio_path"),
+            audio_meta=audio_info,
+            asr_meta=payload,
+            dispatch_mode="dry_run",
+        ),
+    )
     case = append_case(
         DATA_DIR,
         {
@@ -845,6 +899,7 @@ def recognize_text(payload: TextCommand, x_audio_token: Annotated[str | None, He
         },
         route_action=payload.route_action,
         source="audio_recognition",
+        device_id=payload.device_id,
     )
     skill_id = str(routed.get("skill_id") or "")
     plan = routed.get("plan")
@@ -922,6 +977,8 @@ def recognize_text(payload: TextCommand, x_audio_token: Annotated[str | None, He
             "reported_at": time.time(),
         }
     )
+    if isinstance(routed.get("envelope"), dict):
+        save_envelope(DATA_DIR, DecisionEnvelope(**routed["envelope"]))
     raw_asr = payload.raw.get("asr") if isinstance(payload.raw.get("asr"), dict) else payload.raw
     case = record_intermediate_case(
         source=payload.source,

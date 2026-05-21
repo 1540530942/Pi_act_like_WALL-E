@@ -102,6 +102,51 @@ Each persisted case comes from a real capture, upload, or ASR/result report. It 
 
 Edge capture computes the same planner result with dispatch disabled, then uploads the real audio and ASR payload to the cloud. Cloud `/api/results` owns the actual action/face dispatch, which keeps the real execution path single-owner and avoids double-running commands when the Raspberry Pi is connected.
 
+## ReAct Control Skeleton
+
+The first five ReAct整改 stages are implemented as a backward-compatible control skeleton:
+
+```text
+transcript
+  -> DecisionEnvelope
+  -> RuleReactAgent
+  -> Tool Validator
+  -> Safety Guard
+  -> Dispatcher
+  -> Envelope Store / Replay
+```
+
+Files:
+
+```text
+envelope.py          DecisionEnvelope / ToolCall / TaskStep
+react_agent.py       rule-based ReAct-shaped agent, emits structured tool_calls
+tool_validator.py    tool whitelist, skill whitelist, duration clipping/rejection
+safety_guard.py      negative instruction rejection, emergency_stop priority, sequence limits
+dispatcher.py        dry_run / cloud_queue / local_first-compatible dispatch wrapper
+envelope_store.py    data/envelopes/*.json + index.jsonl
+replay.py            replay from text/tool_calls/tasks with dry_run diff
+```
+
+Current default behavior keeps existing APIs stable:
+
+```text
+/api/recognize-text and /api/results still return the legacy result shape.
+route_transcript still returns skill_id/plan/action_task/face_task fields.
+The same call now also carries an envelope payload.
+Simulation and replay use dry_run and do not create real evaluation samples.
+```
+
+Safety notes:
+
+```text
+ReAct Agent never controls hardware directly.
+Tool calls are validated before becoming tasks.
+Safety Guard can reject or replace tasks before dispatch.
+Dispatcher is the only execution layer.
+Edge listener plans with dispatch disabled; cloud /api/results remains the current real dispatch owner.
+```
+
 ## Deployment Direction
 
 - Run `server.py` on Tencent Cloud behind `/audio/`.
