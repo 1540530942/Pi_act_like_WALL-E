@@ -41,6 +41,7 @@ EVENTS_FILE = DATA_DIR / "events.json"
 SETTINGS_FILE = DATA_DIR / "settings.json"
 TOKEN_FILE = DATA_DIR / ".audio_token"
 ACTION_CATALOG_PATH = (BASE_DIR / "../action_move/skill_catalog.json").resolve()
+SKILL_REGISTRY_PATH = (BASE_DIR / "skills/registry.yaml").resolve()
 ACTION_SERVER = os.getenv("AUDIO_ACTION_SERVER", "http://action-move:8094")
 FACE_SERVER = os.getenv("AUDIO_FACE_SERVER", "http://127.0.0.1:8096")
 CAMERA_SERVER = os.getenv("AUDIO_CAMERA_SERVER", "http://camera-snapshot:8099")
@@ -110,19 +111,10 @@ DEFAULT_SETTINGS = {
 
 
 def build_router_config() -> dict[str, Any]:
-    mode = str(os.getenv("AUDIO_TASK_PLANNER_MODE", "rule") or "rule").strip().lower()
-    config: dict[str, Any] = {"skill_catalog": str(ACTION_CATALOG_PATH)}
-    planner: dict[str, Any] = {"mode": mode}
-    llm = {
-        "endpoint": str(os.getenv("AUDIO_TASK_PLANNER_LLM_ENDPOINT", "")).strip(),
-        "model": str(os.getenv("AUDIO_TASK_PLANNER_LLM_MODEL", "")).strip(),
-        "api_key": str(os.getenv("AUDIO_TASK_PLANNER_LLM_API_KEY", "")).strip(),
-        "api_key_env": str(os.getenv("AUDIO_TASK_PLANNER_LLM_API_KEY_ENV", "")).strip(),
-        "timeout_seconds": float(os.getenv("AUDIO_TASK_PLANNER_LLM_TIMEOUT_SECONDS", "30") or 30),
+    config: dict[str, Any] = {
+        "skill_catalog": str(ACTION_CATALOG_PATH),
+        "skill_registry": str(os.getenv("AUDIO_SKILL_REGISTRY", str(SKILL_REGISTRY_PATH))).strip(),
     }
-    if any(llm.values()):
-        planner["llm"] = llm
-    config["planner"] = planner
     react_llm = {
         "endpoint": str(os.getenv("AUDIO_REACT_LLM_ENDPOINT", "https://www.wangyutang.cn/common/api/llm/chat")).strip(),
         "model": str(os.getenv("AUDIO_REACT_LLM_MODEL", "qwen3.5-9b")).strip(),
@@ -465,7 +457,7 @@ def health() -> dict[str, Any]:
         "latest": latest,
         "latest_event": latest_event,
         "age_seconds": age,
-        "planner": build_router_config().get("planner", {}),
+        "router": build_router_config(),
     }
 
 
@@ -488,7 +480,7 @@ def dashboard() -> dict[str, Any]:
         "action": action_snapshot(),
         "camera": camera_snapshot(),
         "settings": load_settings(),
-        "planner": build_router_config().get("planner", {}),
+        "router": build_router_config(),
         "server_time": time.time(),
     }
 

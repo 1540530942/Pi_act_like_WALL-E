@@ -4,3 +4,4 @@ pydantic
 requests
 pyserial
 python-multipart
+PyYAML

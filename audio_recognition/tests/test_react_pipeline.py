@@ -11,6 +11,7 @@ from audio_recognition.envelope import DecisionEnvelope, ToolCall
 from audio_recognition.envelope_store import load_envelope, save_envelope
 from audio_recognition.pipeline import decide_transcript, route_transcript
 from audio_recognition.replay import replay_envelope
+from audio_recognition.skill_registry import load_skill_registry
 from audio_recognition.tool_schema import build_react_tools_schema, tool_skill_groups
 from audio_recognition.tool_validator import validate_tool_calls
 
@@ -19,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 CATALOG_PATH = str(Path(__file__).with_name("skill_catalog.fixture.json").resolve())
 ROUTER_CONFIG = {
     "skill_catalog": CATALOG_PATH,
+    "skill_registry": str((BASE_DIR / "skills" / "registry.yaml").resolve()),
     "react_agent": {"mode": "llm", "llm": {"endpoint": "http://llm.local", "model": "qwen3.5-9b"}},
 }
 
@@ -155,29 +157,52 @@ class ReactPipelineTest(unittest.TestCase):
 
     def test_tool_schema_excludes_catalog_skills_outside_voice_allowlist(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            catalog_path = Path(tmp) / "skill_catalog.json"
-            catalog_path.write_text(
-                json.dumps(
-                    {
-                        "skills": [
-                            {"id": "move_forward", "name_zh": "前进"},
-                            {"id": "remote_shutdown", "name_zh": "关机"},
-                            {"id": "face_happy", "name_zh": "开心"},
-                        ]
-                    },
-                    ensure_ascii=False,
+            registry_path = Path(tmp) / "registry.yaml"
+            registry_path.write_text(
+                "\n".join(
+                    [
+                        "version: 1",
+                        "skills:",
+                        "  - id: move_forward",
+                        "    route: action",
+                        "    tool: dispatch_action",
+                        "    max_duration_ms: 900",
+                        "  - id: remote_shutdown",
+                        "    route: system",
+                        "    tool: dispatch_action",
+                        "    enabled: false",
+                        "  - id: face_happy",
+                        "    route: face",
+                        "    tool: dispatch_face",
+                        "    max_duration_ms: 4000",
+                    ]
                 ),
                 encoding="utf-8",
             )
-            groups = tool_skill_groups(catalog_path)
+            groups = tool_skill_groups(registry_path)
         self.assertEqual(groups["action"], ["move_forward"])
         self.assertEqual(groups["face"], ["face_happy"])
         self.assertNotIn("remote_shutdown", groups["action"])
 
-    def test_tool_schema_uses_safe_fallback_when_catalog_is_missing(self) -> None:
+    def test_tool_schema_uses_catalog_fallback_when_registry_is_missing(self) -> None:
         groups = tool_skill_groups(BASE_DIR / "missing-skill-catalog.json")
         self.assertIn("move_forward", groups["action"])
         self.assertIn("face_happy", groups["face"])
+
+    def test_tool_schema_and_validator_share_registry_duration_limits(self) -> None:
+        registry = load_skill_registry(ROUTER_CONFIG["skill_registry"], CATALOG_PATH)
+        schema = build_react_tools_schema(ROUTER_CONFIG["skill_registry"], CATALOG_PATH)
+        functions = {item["function"]["name"]: item["function"] for item in schema}
+        action_max = functions["dispatch_action"]["parameters"]["properties"]["duration_ms"]["maximum"]
+        self.assertEqual(action_max, registry.max_duration_for_tool("dispatch_action"))
+        self.assertIn("turn_left<=800ms", functions["dispatch_action"]["description"])
+
+        envelope = DecisionEnvelope(
+            transcript="test",
+            tool_calls=[ToolCall(tool="dispatch_action", args={"skill_id": "turn_left", "duration_ms": 99999})],
+        )
+        envelope = validate_tool_calls(envelope, registry_path=ROUTER_CONFIG["skill_registry"], catalog_path=CATALOG_PATH)
+        self.assertEqual(envelope.validated_tool_calls[0].args["duration_ms"], 800)
 
     def test_simple_command_generates_envelope_tool_task_and_dry_run(self) -> None:
         with patch("audio_recognition.react_agent.requests.post", side_effect=[action_response("move_forward", text="前进"), finish_response()]):
@@ -284,7 +309,7 @@ class ReactPipelineTest(unittest.TestCase):
                 ToolCall(tool="dispatch_action", args={"skill_id": "jump"}),
             ],
         )
-        envelope = validate_tool_calls(envelope)
+        envelope = validate_tool_calls(envelope, registry_path=ROUTER_CONFIG["skill_registry"], catalog_path=CATALOG_PATH)
         self.assertEqual(envelope.validated_tool_calls[0].status, "validated")
         self.assertEqual(envelope.validated_tool_calls[0].args["duration_ms"], 1000)
         self.assertEqual(envelope.validated_tool_calls[1].status, "rejected")

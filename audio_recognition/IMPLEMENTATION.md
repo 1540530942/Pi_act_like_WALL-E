@@ -98,9 +98,9 @@ data/intermediate/latest_case.json  latest captured case for quick inspection
 data/intermediate/audio/            copied uploaded or captured audio for replay datasets
 ```
 
-Each persisted case comes from a real capture, upload, or ASR/result report. It links one pipeline pass with a stable `case_id`, recognized text, optional copied audio, raw ASR payload, planner result, selected skill, and action/face routing outputs. Replay and simulation endpoints run with dispatch disabled and do not create new cases, so synthetic tests do not pollute the evaluation dataset.
+Each persisted case comes from a real capture, upload, or ASR/result report. It links one pipeline pass with a stable `case_id`, recognized text, optional copied audio, raw ASR payload, ReAct envelope, selected skill, and action/face routing outputs. Replay and simulation endpoints run with dispatch disabled and do not create new cases, so synthetic tests do not pollute the evaluation dataset.
 
-Edge capture computes the same planner result with dispatch disabled, then uploads the real audio and ASR payload to the cloud. Cloud `/api/results` owns the actual action/face dispatch, which keeps the real execution path single-owner and avoids double-running commands when the Raspberry Pi is connected.
+Edge capture records/transcribes audio, computes a dispatch-disabled ReAct envelope for local diagnostics, then uploads the real audio and ASR payload to the cloud. Cloud `/api/results` owns the actual action/face dispatch, which keeps the real execution path single-owner and avoids double-running commands when the Raspberry Pi is connected.
 
 ## ReAct Control Path
 
@@ -122,8 +122,10 @@ Files:
 envelope.py          DecisionEnvelope / ToolCall / TaskStep
 react_agent.py       LLM ReAct agent, one tool_call or finish per turn
 tool_call_adapter.py Qwen/OpenAI native tool_calls + legacy JSON normalization
-tool_schema.py       builds native tool schema from skill_catalog.json with safe fallback
-tool_validator.py    tool whitelist, skill whitelist, duration clipping/rejection
+tool_schema.py       builds native tool schema from the YAML registry with catalog fallback
+skill_registry.py    loads skills/registry.yaml and exposes the shared skill/tool limits
+skills/registry.yaml YAML source of truth for ReAct-visible skills and duration limits
+tool_validator.py    tool whitelist, skill whitelist, duration clipping/rejection from registry
 safety_guard.py      negative instruction rejection, emergency_stop priority, sequence limits
 dispatcher.py        dry_run / cloud_queue / local_first-compatible dispatch wrapper
 observation_executor.py  get_robot_state / camera_snapshot / ask_confirmation observation path
@@ -140,7 +142,8 @@ Each ReAct turn executes exactly one normalized tool_call or finish.
 If a model returns multiple tool_calls in one turn, only the first is executed.
 The raw assistant message is kept in trace; deferred tool_calls are recorded but are not written back into messages.
 Legacy content JSON remains supported as a fallback and is converted into the same internal turn shape.
-Tool schema is generated from the configured skill_catalog.json voice-safe skill ids, so adding/removing catalog skills updates Qwen tool enums without editing react_agent.py.
+Tool schema and validator limits are generated from the configured YAML skill registry; `skill_catalog.json` is only a compatibility fallback.
+ASR transcription no longer runs the legacy planner. The main control path is transcript -> ReAct -> validator -> safety -> dispatcher.
 ```
 
 Current default behavior keeps existing APIs stable:

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import time
 from pathlib import Path
 from typing import Any
@@ -11,81 +10,26 @@ import requests
 
 try:
     from .envelope import DecisionEnvelope, ToolCall, build_call_id
-    from .face_router import is_face_skill
-    from .planner import build_task_planner
+    from .skill_registry import resolve_catalog_path, resolve_registry_path
     from .tool_call_adapter import normalize_legacy_json_to_react_turn, normalize_tool_calls_to_react_turn
     from .tool_schema import build_react_tools_schema, tool_skill_groups
 except ImportError:
     from envelope import DecisionEnvelope, ToolCall, build_call_id
-    from face_router import is_face_skill
-    from planner import build_task_planner
+    from skill_registry import resolve_catalog_path, resolve_registry_path
     from tool_call_adapter import normalize_legacy_json_to_react_turn, normalize_tool_calls_to_react_turn
     from tool_schema import build_react_tools_schema, tool_skill_groups
 
 
-SEQUENCE_SPLIT_PATTERN = re.compile(r"(?:\u7136\u540e|\u518d|\u63a5\u7740|\u4e4b\u540e|\uff0c|,|;|\uff1b)")
 DEFAULT_LLM_ENDPOINT = "https://www.wangyutang.cn/common/api/llm/chat"
 DEFAULT_LLM_MODEL = "qwen3.5-9b"
 
 
-def _tool_for_skill(skill_id: str) -> str:
-    if skill_id == "emergency_stop":
-        return "emergency_stop"
-    return "dispatch_face" if is_face_skill(skill_id) else "dispatch_action"
-
-
-class RuleReactAgent:
-    """Legacy compatibility shim. Real execution builds LlmReactAgent only."""
-
+class LlmReactAgent:
     def __init__(self, *, base_dir: Path, router_config: dict[str, Any] | None):
         self.base_dir = base_dir
         self.router_config = router_config or {}
-        self.catalog_path = self._resolve_catalog_path(base_dir, self.router_config)
-        self.planner = build_task_planner(self.router_config, self.catalog_path)
-
-    @staticmethod
-    def _resolve_catalog_path(base_dir: Path, router_config: dict[str, Any]) -> Path:
-        catalog_path = Path(str(router_config.get("skill_catalog") or "../action_move/skill_catalog.json"))
-        if not catalog_path.is_absolute():
-            catalog_path = (base_dir / catalog_path).resolve()
-        return catalog_path
-
-    def run(self, envelope: DecisionEnvelope) -> DecisionEnvelope:
-        envelope.t_agent_start = time.time()
-        parts = [part.strip() for part in SEQUENCE_SPLIT_PATTERN.split(envelope.transcript) if part.strip()]
-        if not parts:
-            parts = [envelope.transcript.strip()] if envelope.transcript.strip() else []
-        tool_calls: list[ToolCall] = []
-        agent_steps: list[dict[str, Any]] = []
-        for order, part in enumerate(parts, start=1):
-            plan = self.planner.plan(part)
-            if not plan:
-                agent_steps.append({"order": order, "text": part, "status": "unmatched"})
-                continue
-            args: dict[str, Any] = {
-                "skill_id": plan.skill_id,
-                "route": plan.route,
-                "order": order,
-                "wait_until": "completed",
-                "confidence": plan.confidence,
-                "text": part,
-            }
-            if plan.route == "action" and plan.skill_id != "emergency_stop":
-                args["duration_ms"] = 800 if not plan.skill_id.startswith("turn_") else 600
-            if plan.route == "face":
-                args["duration_ms"] = 3000
-            tool_calls.append(ToolCall(tool=_tool_for_skill(plan.skill_id), args=args))
-            agent_steps.append({"order": order, "text": part, "skill_id": plan.skill_id, "route": plan.route, "planner": plan.planner})
-        envelope.tool_calls = tool_calls
-        envelope.agent_steps = agent_steps
-        envelope.reasoning_summary = f"Generated {len(tool_calls)} structured tool call(s) from transcript." if tool_calls else "No allowed voice skill matched the transcript."
-        envelope.t_agent_end = time.time()
-        return envelope
-
-
-class LlmReactAgent(RuleReactAgent):
-    def __init__(self, *, base_dir: Path, router_config: dict[str, Any] | None):
-        super().__init__(base_dir=base_dir, router_config=router_config)
+        self.catalog_path = resolve_catalog_path(base_dir, self.router_config)
+        self.registry_path = resolve_registry_path(base_dir, self.router_config)
         agent_config = dict((router_config or {}).get("react_agent") or {})
         llm_config = dict(agent_config.get("llm") or {})
         self.endpoint = str(llm_config.get("endpoint") or os.getenv("AUDIO_REACT_LLM_ENDPOINT") or DEFAULT_LLM_ENDPOINT).strip()
@@ -99,7 +43,7 @@ class LlmReactAgent(RuleReactAgent):
             raise RuntimeError("react_agent.llm.endpoint and model are required")
 
     def _system_prompt(self) -> str:
-        groups = tool_skill_groups(self.catalog_path)
+        groups = tool_skill_groups(self.registry_path, self.catalog_path)
         allowed = {
             "dispatch_action": groups["action"],
             "dispatch_face": groups["face"],
@@ -138,7 +82,7 @@ class LlmReactAgent(RuleReactAgent):
         )
 
     def _tools_schema(self) -> list[dict[str, Any]]:
-        return build_react_tools_schema(self.catalog_path)
+        return build_react_tools_schema(self.registry_path, self.catalog_path)
 
     def _parse_response(self, text: str) -> dict[str, Any]:
         stripped = text.strip()

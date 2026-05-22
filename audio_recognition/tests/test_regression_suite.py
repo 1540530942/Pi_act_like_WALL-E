@@ -94,7 +94,7 @@ class AudioRegressionSuite(unittest.TestCase):
     def test_case_count_is_20_plus(self) -> None:
         self.assertGreaterEqual(len(self.cases), 20)
 
-    def test_audio_cases_map_to_expected_skill_ids(self) -> None:
+    def test_audio_cases_return_real_asr_without_legacy_planner(self) -> None:
         for case in self.cases:
             with self.subTest(case=case["id"]):
                 result = transcribe_audio_path(
@@ -103,9 +103,10 @@ class AudioRegressionSuite(unittest.TestCase):
                     provider=self.provider,
                     router_config=self.router_config,
                 )
-                self.assertEqual(result["skill_id"], case["expected_skill_id"])
-                plan = result["plan"] or {}
-                self.assertEqual(plan.get("route", "none"), case["expected_route"])
+                self.assertEqual(result["text"], case["transcript"])
+                self.assertEqual(result["raw"]["fixture_id"], case["id"])
+                self.assertEqual(result["skill_id"], "")
+                self.assertIsNone(result["plan"])
 
     def test_rule_planner_builds_expected_plan(self) -> None:
         planner = build_task_planner(self.router_config, self.router_config["skill_catalog"])

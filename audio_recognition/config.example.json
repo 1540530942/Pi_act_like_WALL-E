@@ -36,18 +36,9 @@
     "face_enabled": true
   },
   "router": {
+    "skill_registry": "skills/registry.yaml",
     "skill_catalog": "../action_move/skill_catalog.json",
     "min_confidence": 0.65,
-    "planner": {
-      "mode": "rule",
-      "llm": {
-        "endpoint": "",
-        "model": "",
-        "api_key": "",
-        "api_key_env": "",
-        "timeout_seconds": 30
-      }
-    },
     "react_agent": {
       "mode": "llm",
       "max_steps": 8,

@@ -1,23 +1,15 @@
 from __future__ import annotations
 
 import time
+from pathlib import Path
 from typing import Any
 
 try:
     from .envelope import DecisionEnvelope, TaskStep, ToolCall
-    from .face_router import FACE_SKILL_IDS
-    from .voice_intents import ALLOWED_VOICE_SKILL_IDS
+    from .skill_registry import OBSERVATION_TOOLS, SYSTEM_TOOLS, SkillRegistry, load_skill_registry
 except ImportError:
     from envelope import DecisionEnvelope, TaskStep, ToolCall
-    from face_router import FACE_SKILL_IDS
-    from voice_intents import ALLOWED_VOICE_SKILL_IDS
-
-
-ACTION_SKILLS = ALLOWED_VOICE_SKILL_IDS - FACE_SKILL_IDS
-ALLOWED_TOOLS = {"dispatch_action", "dispatch_face", "emergency_stop", "camera_snapshot", "get_robot_state", "ask_confirmation", "finish"}
-MAX_MOVE_DURATION_MS = 1000
-MAX_TURN_DURATION_MS = 800
-MAX_FACE_DURATION_MS = 5000
+    from skill_registry import OBSERVATION_TOOLS, SYSTEM_TOOLS, SkillRegistry, load_skill_registry
 
 
 def _reject(call: ToolCall, reason: str) -> ToolCall:
@@ -27,93 +19,113 @@ def _reject(call: ToolCall, reason: str) -> ToolCall:
     return updated
 
 
-def _validate_duration(skill_id: str, duration: int | None) -> tuple[int | None, str]:
+def _registry(registry_path: str | Path | None = None, catalog_path: str | Path | None = None) -> SkillRegistry:
+    candidate = Path(registry_path) if registry_path else None
+    if candidate and candidate.suffix.lower() == ".json" and catalog_path is None:
+        return load_skill_registry(None, candidate)
+    return load_skill_registry(candidate, catalog_path)
+
+
+def _append_validator_error(envelope: DecisionEnvelope, rejected: ToolCall) -> None:
+    envelope.validated_tool_calls.append(rejected)
+    envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
+
+
+def _validate_duration(skill_id: str, args: dict[str, Any], registry: SkillRegistry) -> tuple[int | None, str]:
+    spec = registry.get(skill_id)
+    duration = args.get("duration_ms")
     if duration is None:
         return None, ""
     try:
         value = int(duration)
     except (TypeError, ValueError):
         return None, "invalid_duration_ms"
-    if skill_id.startswith("turn_") and value > MAX_TURN_DURATION_MS:
-        return MAX_TURN_DURATION_MS, "duration_clipped"
-    if skill_id.startswith("move_") and value > MAX_MOVE_DURATION_MS:
-        return MAX_MOVE_DURATION_MS, "duration_clipped"
-    if skill_id.startswith("face_") and value > MAX_FACE_DURATION_MS:
-        return MAX_FACE_DURATION_MS, "duration_clipped"
-    if value < 0:
+    if value < (spec.min_duration_ms if spec else 0):
         return None, "invalid_duration_ms"
+    if spec and spec.max_duration_ms is not None and value > spec.max_duration_ms:
+        return spec.max_duration_ms, "duration_clipped"
     return value, ""
 
 
-def validate_tool_call(envelope: DecisionEnvelope, call: ToolCall) -> TaskStep | None:
+def validate_tool_call(
+    envelope: DecisionEnvelope,
+    call: ToolCall,
+    registry_path: str | Path | None = None,
+    catalog_path: str | Path | None = None,
+) -> TaskStep | None:
+    registry = _registry(registry_path, catalog_path)
     envelope.t_validate = time.time()
-    if call.tool not in ALLOWED_TOOLS:
-        rejected = _reject(call, "unsupported_tool")
-        envelope.validated_tool_calls.append(rejected)
-        envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
+    allowed_tools = {spec.tool for spec in registry.skills.values() if spec.enabled} | OBSERVATION_TOOLS | SYSTEM_TOOLS
+    if call.tool not in allowed_tools:
+        _append_validator_error(envelope, _reject(call, "unsupported_tool"))
         return None
+
     args: dict[str, Any] = dict(call.args)
     wait_until = str(args.get("wait_until") or "completed")
     if wait_until not in {"accepted", "completed"}:
-        rejected = _reject(call, "invalid_wait_until")
-        envelope.validated_tool_calls.append(rejected)
-        envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
+        _append_validator_error(envelope, _reject(call, "invalid_wait_until"))
         return None
-    skill_id = str(args.get("skill_id") or "")
+
     if call.tool == "finish":
         accepted = call.model_copy(deep=True)
         accepted.status = "validated"
         envelope.validated_tool_calls.append(accepted)
         return None
-    if call.tool == "dispatch_action" and skill_id not in ACTION_SKILLS:
-        rejected = _reject(call, "unsupported_action_skill")
-        envelope.validated_tool_calls.append(rejected)
-        envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
+
+    if call.tool in OBSERVATION_TOOLS:
+        accepted = call.model_copy(deep=True)
+        accepted.status = "validated"
+        envelope.validated_tool_calls.append(accepted)
         return None
-    if call.tool == "dispatch_face" and skill_id not in FACE_SKILL_IDS:
-        rejected = _reject(call, "unsupported_face_skill")
-        envelope.validated_tool_calls.append(rejected)
-        envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
-        return None
+
+    skill_id = str(args.get("skill_id") or "")
     if call.tool == "emergency_stop":
         skill_id = "emergency_stop"
         args["skill_id"] = skill_id
-    if call.tool in {"dispatch_action", "dispatch_face", "emergency_stop"}:
-        duration, duration_note = _validate_duration(skill_id, args.get("duration_ms"))
-        if duration_note == "invalid_duration_ms":
-            rejected = _reject(call, duration_note)
-            envelope.validated_tool_calls.append(rejected)
-            envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
-            return None
-        if duration is not None:
-            args["duration_ms"] = duration
-        route = "face" if call.tool == "dispatch_face" else "action"
-        accepted = call.model_copy(deep=True)
-        accepted.args = args
-        accepted.status = "validated"
-        if duration_note:
-            accepted.result["validator_note"] = duration_note
-        envelope.validated_tool_calls.append(accepted)
-        task = TaskStep(
-            task_id=accepted.call_id.replace("call_", "task_"),
-            skill_id=skill_id,
-            route=route,
-            order=int(args.get("order") or len(envelope.tasks) + 1),
-            duration_ms=args.get("duration_ms"),
-            wait_until=wait_until,
-        )
-        envelope.tasks.append(task)
-        return task
+
+    spec = registry.get(skill_id)
+    if spec is None or spec.tool != call.tool:
+        reason = {
+            "dispatch_action": "unsupported_action_skill",
+            "dispatch_face": "unsupported_face_skill",
+            "emergency_stop": "unsupported_emergency_skill",
+        }.get(call.tool, "unsupported_skill")
+        _append_validator_error(envelope, _reject(call, reason))
+        return None
+
+    duration, duration_note = _validate_duration(skill_id, args, registry)
+    if duration_note == "invalid_duration_ms":
+        _append_validator_error(envelope, _reject(call, duration_note))
+        return None
+    if duration is not None:
+        args["duration_ms"] = duration
+
     accepted = call.model_copy(deep=True)
+    accepted.args = args
     accepted.status = "validated"
+    if duration_note:
+        accepted.result["validator_note"] = duration_note
     envelope.validated_tool_calls.append(accepted)
-    return None
+    task = TaskStep(
+        task_id=accepted.call_id.replace("call_", "task_"),
+        skill_id=skill_id,
+        route=spec.route,
+        order=int(args.get("order") or len(envelope.tasks) + 1),
+        duration_ms=args.get("duration_ms"),
+        wait_until=wait_until,
+    )
+    envelope.tasks.append(task)
+    return task
 
 
-def validate_tool_calls(envelope: DecisionEnvelope) -> DecisionEnvelope:
+def validate_tool_calls(
+    envelope: DecisionEnvelope,
+    registry_path: str | Path | None = None,
+    catalog_path: str | Path | None = None,
+) -> DecisionEnvelope:
     original_calls = list(envelope.tool_calls)
     envelope.validated_tool_calls = []
     envelope.tasks = []
     for call in original_calls:
-        validate_tool_call(envelope, call)
+        validate_tool_call(envelope, call, registry_path=registry_path, catalog_path=catalog_path)
     return envelope

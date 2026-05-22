@@ -4,41 +4,23 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from .contracts import PlannedTask
     from .dispatcher import dispatch_envelope, dispatch_task
     from .envelope import DecisionEnvelope, ToolCall
-    from .executors import execute_planned_task
-    from .planner import build_task_planner
     from .observation_executor import OBSERVATION_TOOLS, execute_observation_tool
     from .react_agent import build_llm_react_agent, run_react_agent
     from .safety_guard import has_emergency_intent, run_safety_guard, run_safety_guard_for_task
+    from .skill_registry import resolve_catalog_path, resolve_registry_path
     from .tool_call_adapter import build_tool_result_message
     from .tool_validator import validate_tool_call, validate_tool_calls
 except ImportError:
-    from contracts import PlannedTask
     from dispatcher import dispatch_envelope, dispatch_task
     from envelope import DecisionEnvelope, ToolCall
-    from executors import execute_planned_task
-    from planner import build_task_planner
     from observation_executor import OBSERVATION_TOOLS, execute_observation_tool
     from react_agent import build_llm_react_agent, run_react_agent
     from safety_guard import has_emergency_intent, run_safety_guard, run_safety_guard_for_task
+    from skill_registry import resolve_catalog_path, resolve_registry_path
     from tool_call_adapter import build_tool_result_message
     from tool_validator import validate_tool_call, validate_tool_calls
-
-
-def resolve_catalog_path(base_dir: Path, router_config: dict[str, Any] | None) -> Path:
-    router_config = router_config or {}
-    catalog_path = Path(str(router_config.get("skill_catalog") or "../action_move/skill_catalog.json"))
-    if not catalog_path.is_absolute():
-        catalog_path = (base_dir / catalog_path).resolve()
-    return catalog_path
-
-
-def plan_transcript(base_dir: Path, text: str, router_config: dict[str, Any] | None) -> PlannedTask | None:
-    catalog_path = resolve_catalog_path(base_dir, router_config)
-    planner = build_task_planner(router_config, catalog_path)
-    return planner.plan(text)
 
 
 def route_transcript(
@@ -65,9 +47,15 @@ def route_transcript(
     execution = first_execution if isinstance(first_execution, dict) else {}
     plan = None
     if first_task:
-        plan = PlannedTask(skill_id=first_task.skill_id, route=first_task.route, planner="react_llm", confidence=1.0, transcript=text.strip())
+        plan = {
+            "skill_id": first_task.skill_id,
+            "route": first_task.route,
+            "planner": "react_llm",
+            "confidence": 1.0,
+            "transcript": text.strip(),
+        }
     return {
-        "plan": plan.model_dump() if plan else None,
+        "plan": plan,
         "skill_id": first_task.skill_id if first_task else "",
         "action_task": execution.get("action_task"),
         "face_task": execution.get("face_task"),
@@ -90,6 +78,9 @@ def decide_transcript(
 ) -> DecisionEnvelope:
     envelope = DecisionEnvelope(device_id=device_id, source=source, transcript=str(text or "").strip(), raw=raw or {})
     envelope.source_chain.append({"node": source, "stage": "received", "ts": envelope.t_created})
+    catalog_path = resolve_catalog_path(base_dir, router_config)
+    registry_path = resolve_registry_path(base_dir, router_config)
+    envelope.raw.setdefault("skill_registry", {"path": str(registry_path), "catalog_fallback": str(catalog_path)})
     if not envelope.transcript:
         envelope.reasoning_summary = "Empty transcript."
         return envelope
@@ -101,7 +92,7 @@ def decide_transcript(
         )
         envelope.tool_calls.append(call)
         envelope.react_turns.append({"turn": 0, "assistant_tool_call": call.model_dump(), "preflight": True})
-        task = validate_tool_call(envelope, call)
+        task = validate_tool_call(envelope, call, registry_path=registry_path, catalog_path=catalog_path)
         if task:
             checked_task = run_safety_guard_for_task(envelope, task)
             if checked_task.status == "rejected":
@@ -168,9 +159,9 @@ def decide_transcript(
         envelope.react_turns.append(turn_record)
         if call.tool == "finish":
             envelope.final_response = str(call.args.get("message") or call.args.get("final") or "done")
-            validate_tool_call(envelope, call)
+            validate_tool_call(envelope, call, registry_path=registry_path, catalog_path=catalog_path)
             break
-        task = validate_tool_call(envelope, call)
+        task = validate_tool_call(envelope, call, registry_path=registry_path, catalog_path=catalog_path)
         if not task:
             if call.tool in OBSERVATION_TOOLS:
                 observation = execute_observation_tool(envelope, call, cloud_config or {})
@@ -211,11 +202,10 @@ def transcribe_audio_path(
 ) -> dict[str, Any]:
     transcript = provider.transcribe(wav_path)
     text = str(transcript.get("text") or "").strip()
-    plan = plan_transcript(base_dir, text, router_config) if text else None
     return {
         "text": text,
         "raw": transcript.get("raw", {}),
         "error": str(transcript.get("error") or ""),
-        "plan": plan.model_dump() if plan else None,
-        "skill_id": plan.skill_id if plan else "",
+        "plan": None,
+        "skill_id": "",
     }

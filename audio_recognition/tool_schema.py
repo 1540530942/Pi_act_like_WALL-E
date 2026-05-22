@@ -4,68 +4,51 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from .face_router import FACE_SKILL_IDS
-    from .skill_router import load_catalog
-    from .voice_intents import ALLOWED_VOICE_SKILL_IDS
+    from .skill_registry import SkillRegistry, load_skill_registry
 except ImportError:
-    from face_router import FACE_SKILL_IDS
-    from skill_router import load_catalog
-    from voice_intents import ALLOWED_VOICE_SKILL_IDS
+    from skill_registry import SkillRegistry, load_skill_registry
 
 
-DEFAULT_ACTION_SKILLS = [
-    "move_forward", "move_backward", "move_left", "move_right",
-    "turn_left", "turn_right", "look_left", "look_right",
-    "look_up", "look_down", "reset_pose",
-]
-DEFAULT_FACE_SKILLS = [
-    "face_neutral", "face_happy", "face_joy", "face_sad",
-    "face_angry", "face_speak", "face_mouth_open", "face_blink", "face_reset",
-]
+def _registry(registry_path: str | Path | None = None, catalog_path: str | Path | None = None) -> SkillRegistry:
+    candidate = Path(registry_path) if registry_path else None
+    if candidate and candidate.suffix.lower() == ".json" and catalog_path is None:
+        return load_skill_registry(None, candidate)
+    return load_skill_registry(candidate, catalog_path)
 
 
-def _catalog_skill_ids(catalog_path: str | Path) -> list[str]:
-    try:
-        catalog = load_catalog(catalog_path)
-    except Exception:
-        return []
-    skill_ids: list[str] = []
-    for item in catalog.get("skills", []):
-        skill_id = str(item.get("id") or "").strip()
-        if skill_id and skill_id in ALLOWED_VOICE_SKILL_IDS:
-            skill_ids.append(skill_id)
-    return sorted(set(skill_ids))
-
-
-def tool_skill_groups(catalog_path: str | Path) -> dict[str, list[str]]:
-    skill_ids = _catalog_skill_ids(catalog_path)
-    action_skills = [skill_id for skill_id in skill_ids if skill_id not in FACE_SKILL_IDS and skill_id != "emergency_stop"]
-    face_skills = [skill_id for skill_id in skill_ids if skill_id in FACE_SKILL_IDS]
+def tool_skill_groups(registry_path: str | Path | None = None, catalog_path: str | Path | None = None) -> dict[str, list[str]]:
+    registry = _registry(registry_path, catalog_path)
     return {
-        "action": action_skills or DEFAULT_ACTION_SKILLS,
-        "face": face_skills or DEFAULT_FACE_SKILLS,
+        "action": [spec.skill_id for spec in registry.by_tool("dispatch_action")],
+        "face": [spec.skill_id for spec in registry.by_tool("dispatch_face")],
     }
 
 
-def build_react_tools_schema(catalog_path: str | Path) -> list[dict[str, Any]]:
-    groups = tool_skill_groups(catalog_path)
+def build_react_tools_schema(registry_path: str | Path | None = None, catalog_path: str | Path | None = None) -> list[dict[str, Any]]:
+    registry = _registry(registry_path, catalog_path)
+    action_skills = registry.by_tool("dispatch_action")
+    face_skills = registry.by_tool("dispatch_face")
+    action_max = registry.max_duration_for_tool("dispatch_action") or 1000
+    face_max = registry.max_duration_for_tool("dispatch_face") or 5000
     common = {
         "order": {"type": "integer", "minimum": 1},
         "wait_until": {"type": "string", "enum": ["accepted", "completed"]},
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
         "text": {"type": "string"},
     }
+    action_notes = registry.duration_notes_for_tool("dispatch_action")
+    face_notes = registry.duration_notes_for_tool("dispatch_face")
     return [
         {
             "type": "function",
             "function": {
                 "name": "dispatch_action",
-                "description": "Execute one bounded robot motion or pose skill from the configured skill catalog.",
+                "description": f"Execute one bounded robot motion or pose skill from the configured YAML registry. Duration limits: {action_notes}.",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "skill_id": {"type": "string", "enum": groups["action"]},
-                        "duration_ms": {"type": "integer", "minimum": 0, "maximum": 1000},
+                        "skill_id": {"type": "string", "enum": [spec.skill_id for spec in action_skills]},
+                        "duration_ms": {"type": "integer", "minimum": 0, "maximum": action_max},
                         **common,
                     },
                     "required": ["skill_id"],
@@ -77,12 +60,12 @@ def build_react_tools_schema(catalog_path: str | Path) -> list[dict[str, Any]]:
             "type": "function",
             "function": {
                 "name": "dispatch_face",
-                "description": "Execute one face expression skill from the configured skill catalog.",
+                "description": f"Execute one face expression skill from the configured YAML registry. Duration limits: {face_notes}.",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "skill_id": {"type": "string", "enum": groups["face"]},
-                        "duration_ms": {"type": "integer", "minimum": 0, "maximum": 5000},
+                        "skill_id": {"type": "string", "enum": [spec.skill_id for spec in face_skills]},
+                        "duration_ms": {"type": "integer", "minimum": 0, "maximum": face_max},
                         **common,
                     },
                     "required": ["skill_id"],
