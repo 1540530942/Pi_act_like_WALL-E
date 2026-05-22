@@ -102,14 +102,14 @@ Each persisted case comes from a real capture, upload, or ASR/result report. It 
 
 Edge capture computes the same planner result with dispatch disabled, then uploads the real audio and ASR payload to the cloud. Cloud `/api/results` owns the actual action/face dispatch, which keeps the real execution path single-owner and avoids double-running commands when the Raspberry Pi is connected.
 
-## ReAct Control Skeleton
+## ReAct Control Path
 
-The first five ReAct整改 stages are implemented as a backward-compatible control skeleton:
+The current control path uses a single-tool ReAct protocol:
 
 ```text
 transcript
   -> DecisionEnvelope
-  -> RuleReactAgent
+  -> LlmReactAgent
   -> Tool Validator
   -> Safety Guard
   -> Dispatcher
@@ -120,12 +120,21 @@ Files:
 
 ```text
 envelope.py          DecisionEnvelope / ToolCall / TaskStep
-react_agent.py       rule-based ReAct-shaped agent, emits structured tool_calls
+react_agent.py       LLM ReAct agent, one tool_call or finish per turn
 tool_validator.py    tool whitelist, skill whitelist, duration clipping/rejection
 safety_guard.py      negative instruction rejection, emergency_stop priority, sequence limits
 dispatcher.py        dry_run / cloud_queue / local_first-compatible dispatch wrapper
+observation_executor.py  get_robot_state / camera_snapshot / ask_confirmation observation path
 envelope_store.py    data/envelopes/*.json + index.jsonl
 replay.py            replay from text/tool_calls/tasks with dry_run diff
+```
+
+Protocol:
+
+```text
+protocol_version = react_v1_single_tool
+Each LLM turn may return exactly one tool_call or finish.
+Bulk tool_calls are rejected and recorded in envelope.errors.
 ```
 
 Current default behavior keeps existing APIs stable:
@@ -142,9 +151,49 @@ Safety notes:
 ```text
 ReAct Agent never controls hardware directly.
 Tool calls are validated before becoming tasks.
+Emergency commands such as 不要动 / 别动 / 停止 / 急停 bypass the LLM and produce emergency_stop.
 Safety Guard can reject or replace tasks before dispatch.
 Dispatcher is the only execution layer.
 Edge listener plans with dispatch disabled; cloud /api/results remains the current real dispatch owner.
+```
+
+Observation path:
+
+```text
+camera_snapshot / get_robot_state / ask_confirmation
+  -> observation_executor
+  -> envelope.observations
+  -> tool_result in ReAct messages
+  -> next LLM turn
+```
+
+`get_robot_state` currently reads the configured action controller `/health` endpoint when available.
+`ask_confirmation` records a synchronous pending observation for the prototype path.
+`camera_snapshot` requires `camera_server`; missing configuration is recorded as a failed observation instead of being silently ignored.
+
+## ReAct Regression Check
+
+When the LLM is being deployed, run the checks that do not require the model:
+
+```bash
+python audio_recognition/react_regression_check.py --skip-llm --action-server http://127.0.0.1:18765
+```
+
+After qwen3.5-9b is available through the LV tunnel:
+
+```bash
+python audio_recognition/react_regression_check.py \
+  --llm-endpoint http://127.0.0.1:18002/v1/chat/completions \
+  --action-server http://127.0.0.1:18765
+```
+
+For real Pi execution, add `--real`. The script performs an emergency stop before and after real execution:
+
+```bash
+python audio_recognition/react_regression_check.py \
+  --llm-endpoint http://127.0.0.1:18002/v1/chat/completions \
+  --action-server http://127.0.0.1:18765 \
+  --real
 ```
 
 ## Deployment Direction

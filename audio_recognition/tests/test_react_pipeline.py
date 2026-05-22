@@ -58,6 +58,18 @@ def observation_response(tool: str, *, order: int = 1) -> Mock:
     )
 
 
+def multi_tool_response() -> Mock:
+    return llm_response(
+        {
+            "protocol_version": "react_v1_single_tool",
+            "tool_calls": [
+                {"tool": "dispatch_action", "args": {"skill_id": "move_forward"}},
+                {"tool": "dispatch_action", "args": {"skill_id": "turn_right"}},
+            ],
+        }
+    )
+
+
 def finish_response(order: int = 2) -> Mock:
     return llm_response(
         {
@@ -240,6 +252,61 @@ class ReactPipelineTest(unittest.TestCase):
         self.assertEqual(envelope.observations[0]["tool"], "get_robot_state")
         self.assertEqual(envelope.observations[0]["data"]["battery_pct"], 82)
         self.assertEqual(envelope.final_response, "done")
+
+    def test_observation_failure_is_recorded_and_loop_can_finish(self) -> None:
+        with patch(
+            "audio_recognition.react_agent.requests.post",
+            side_effect=[observation_response("camera_snapshot"), finish_response(2)],
+        ):
+            envelope = decide_transcript(
+                base_dir=BASE_DIR,
+                text="\u770b\u4e00\u4e0b\u524d\u9762",
+                router_config=ROUTER_CONFIG,
+                cloud_config={},
+                dispatch_mode="dry_run",
+                source="unit",
+            )
+        self.assertEqual(envelope.observations[0]["tool"], "camera_snapshot")
+        self.assertEqual(envelope.observations[0]["status"], "failed")
+        self.assertIn("camera_server is required", envelope.observations[0]["error"])
+        self.assertEqual(envelope.final_response, "done")
+
+    def test_ask_confirmation_records_pending_observation(self) -> None:
+        response = llm_response(
+            {
+                "protocol_version": "react_v1_single_tool",
+                "tool_call": {
+                    "tool": "ask_confirmation",
+                    "args": {"question": "\u8981\u524d\u8fdb\u5417\uff1f", "timeout_s": 10},
+                },
+            }
+        )
+        with patch("audio_recognition.react_agent.requests.post", side_effect=[response, finish_response(2)]):
+            envelope = decide_transcript(
+                base_dir=BASE_DIR,
+                text="\u597d\u50cf\u662f\u524d\u8fdb",
+                router_config=ROUTER_CONFIG,
+                cloud_config={},
+                dispatch_mode="dry_run",
+                source="unit",
+            )
+        self.assertEqual(envelope.observations[0]["tool"], "ask_confirmation")
+        self.assertEqual(envelope.observations[0]["status"], "pending")
+        self.assertEqual(envelope.observations[0]["data"]["question"], "\u8981\u524d\u8fdb\u5417\uff1f")
+
+    def test_multiple_tool_calls_are_rejected_by_single_tool_protocol(self) -> None:
+        with patch("audio_recognition.react_agent.requests.post", return_value=multi_tool_response()):
+            envelope = decide_transcript(
+                base_dir=BASE_DIR,
+                text="\u524d\u8fdb\u7136\u540e\u53f3\u8f6c",
+                router_config=ROUTER_CONFIG,
+                cloud_config={},
+                dispatch_mode="dry_run",
+                source="unit",
+            )
+        self.assertEqual(envelope.tasks, [])
+        self.assertEqual(envelope.dispatch_results, [])
+        self.assertIn("exactly one tool_call", envelope.errors[0]["message"])
 
     def test_llm_react_agent_generates_sequence_without_rule_fallback(self) -> None:
         with patch(

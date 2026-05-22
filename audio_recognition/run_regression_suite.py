@@ -12,8 +12,10 @@ if str(ROOT_DIR) not in sys.path:
 
 
 TEST_MODULES = [
+    "audio_recognition.tests.test_react_pipeline",
     "audio_recognition.tests.test_regression_suite",
     "audio_recognition.tests.test_planner_modes",
+    "audio_recognition.tests.test_intermediate_store",
 ]
 
 
