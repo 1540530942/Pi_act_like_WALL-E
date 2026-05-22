@@ -6,20 +6,22 @@ from typing import Any
 try:
     from .contracts import PlannedTask
     from .dispatcher import dispatch_envelope, dispatch_task
-    from .envelope import DecisionEnvelope
+    from .envelope import DecisionEnvelope, ToolCall
     from .executors import execute_planned_task
     from .planner import build_task_planner
+    from .observation_executor import OBSERVATION_TOOLS, execute_observation_tool
     from .react_agent import build_llm_react_agent, run_react_agent
-    from .safety_guard import run_safety_guard, run_safety_guard_for_task
+    from .safety_guard import has_emergency_intent, run_safety_guard, run_safety_guard_for_task
     from .tool_validator import validate_tool_call, validate_tool_calls
 except ImportError:
     from contracts import PlannedTask
     from dispatcher import dispatch_envelope, dispatch_task
-    from envelope import DecisionEnvelope
+    from envelope import DecisionEnvelope, ToolCall
     from executors import execute_planned_task
     from planner import build_task_planner
+    from observation_executor import OBSERVATION_TOOLS, execute_observation_tool
     from react_agent import build_llm_react_agent, run_react_agent
-    from safety_guard import run_safety_guard, run_safety_guard_for_task
+    from safety_guard import has_emergency_intent, run_safety_guard, run_safety_guard_for_task
     from tool_validator import validate_tool_call, validate_tool_calls
 
 
@@ -85,8 +87,31 @@ def decide_transcript(
     raw: dict[str, Any] | None = None,
 ) -> DecisionEnvelope:
     envelope = DecisionEnvelope(device_id=device_id, source=source, transcript=str(text or "").strip(), raw=raw or {})
+    envelope.source_chain.append({"node": source, "stage": "received", "ts": envelope.t_created})
     if not envelope.transcript:
         envelope.reasoning_summary = "Empty transcript."
+        return envelope
+    if has_emergency_intent(envelope.transcript):
+        envelope.reasoning_summary = "Emergency intent detected before LLM; dispatching emergency_stop."
+        call = ToolCall(
+            tool="emergency_stop",
+            args={"skill_id": "emergency_stop", "order": 0, "wait_until": "accepted", "confidence": 1.0, "text": envelope.transcript},
+        )
+        envelope.tool_calls.append(call)
+        envelope.react_turns.append({"turn": 0, "assistant_tool_call": call.model_dump(), "preflight": True})
+        task = validate_tool_call(envelope, call)
+        if task:
+            checked_task = run_safety_guard_for_task(envelope, task)
+            if checked_task.status == "rejected":
+                task.status = checked_task.status
+                task.error = checked_task.error
+                result = {"task_id": task.task_id, "skill_id": task.skill_id, "status": "rejected", "error": task.error}
+                envelope.dispatch_results.append(result)
+            else:
+                result = dispatch_task(envelope, task, cloud_config=cloud_config or {}, source=source, dispatch_mode=dispatch_mode)
+            envelope.react_turns[-1]["tool_result"] = result
+        envelope.final_response = "emergency_stop"
+        envelope.t_agent_end = __import__("time").time()
         return envelope
     try:
         agent = build_llm_react_agent(base_dir=base_dir, router_config=router_config)
@@ -116,7 +141,11 @@ def decide_transcript(
             break
         task = validate_tool_call(envelope, call)
         if not task:
-            tool_result = {"ok": False, "error": "tool_call_rejected", "tool": call.tool}
+            if call.tool in OBSERVATION_TOOLS:
+                observation = execute_observation_tool(envelope, call, cloud_config or {})
+                tool_result = {"ok": observation.get("status") != "failed", "observation": observation}
+            else:
+                tool_result = {"ok": False, "error": "tool_call_rejected", "tool": call.tool}
             messages.append({"role": "tool", "content": __import__("json").dumps(tool_result, ensure_ascii=False)})
             envelope.react_turns[-1]["tool_result"] = tool_result
             continue

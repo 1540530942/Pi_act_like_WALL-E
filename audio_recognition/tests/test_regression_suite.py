@@ -7,7 +7,7 @@ import tempfile
 import unittest
 import wave
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from fastapi.testclient import TestClient
 
@@ -31,6 +31,36 @@ class FixtureAudioProvider:
         return {"text": self.transcripts.get(fixture_id, ""), "raw": {"fixture_id": fixture_id}}
 
 
+def llm_response(payload: dict) -> Mock:
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {"text": json.dumps(payload, ensure_ascii=False)}
+    return response
+
+
+def action_response(skill_id: str, *, text: str = "", order: int = 1) -> Mock:
+    return llm_response(
+        {
+            "protocol_version": "react_v1_single_tool",
+            "tool_call": {
+                "tool": "dispatch_action",
+                "args": {
+                    "skill_id": skill_id,
+                    "order": order,
+                    "duration_ms": 800,
+                    "wait_until": "completed",
+                    "confidence": 0.9,
+                    "text": text or skill_id,
+                },
+            },
+        }
+    )
+
+
+def finish_response(order: int = 2) -> Mock:
+    return llm_response({"protocol_version": "react_v1_single_tool", "type": "finish", "final": "done"})
+
+
 def write_fixture_wav(target: Path, seconds: float = 0.25, sample_rate: int = 16000) -> None:
     frames = int(seconds * sample_rate)
     with wave.open(str(target), "wb") as handle:
@@ -52,6 +82,10 @@ class AudioRegressionSuite(unittest.TestCase):
             write_fixture_wav(cls.temp_dir / f"{case['id']}.wav")
         cls.provider = FixtureAudioProvider(cls.transcripts)
         cls.router_config = {"skill_catalog": str(CATALOG_PATH.resolve())}
+        cls.react_router_config = {
+            **cls.router_config,
+            "react_agent": {"mode": "llm", "llm": {"endpoint": "http://llm.local", "model": "qwen3.5-9b"}},
+        }
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -95,14 +129,15 @@ class AudioRegressionSuite(unittest.TestCase):
         self.assertIsNone(routed["plan"])
 
     def test_execute_planned_task_routes_action(self) -> None:
-        routed = route_transcript(
-            base_dir=BASE_DIR,
-            text="前进",
-            router_config=self.router_config,
-            cloud_config={"action_enabled": True, "action_server": "http://action.local"},
-            route_action=False,
-            source="test",
-        )
+        with patch("audio_recognition.react_agent.requests.post", side_effect=[action_response("move_forward", text="前进"), finish_response()]):
+            routed = route_transcript(
+                base_dir=BASE_DIR,
+                text="前进",
+                router_config=self.react_router_config,
+                cloud_config={"action_enabled": True, "action_server": "http://action.local"},
+                route_action=False,
+                source="test",
+            )
         with patch("audio_recognition.executors.create_action_task", return_value={"task": {"id": "t1"}}) as create_action_task:
             result = execute_planned_task(
                 build_task_planner(self.router_config, self.router_config["skill_catalog"]).plan("前进"),

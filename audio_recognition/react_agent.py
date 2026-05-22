@@ -107,6 +107,7 @@ class LlmReactAgent(RuleReactAgent):
             "finish": ["finish"],
         }
         schema = {
+            "protocol_version": "react_v1_single_tool",
             "reasoning_summary": "short Chinese summary, no hidden chain-of-thought",
             "tool_call": {
                 "tool": "dispatch_action | dispatch_face | emergency_stop | finish",
@@ -121,7 +122,7 @@ class LlmReactAgent(RuleReactAgent):
             "final": "only for finish",
         }
         return (
-            "Output only compact JSON. No Thinking Process. One ReAct turn equals one tool_call. "
+            "Output only compact JSON. protocol_version=react_v1_single_tool. No Thinking Process. One ReAct turn equals one tool_call. "
             "After a completed/dry_run tool result, choose the next unfinished positive command; output finish when done. "
             "Negated fragments such as \u4e0d\u8981/\u522b/\u4e0d\u8bb8/\u4e0d\u7528 do not create that action and do not cancel previous completed actions. "
             "\u505c\u6b62/\u6025\u505c/\u522b\u52a8/\u4e0d\u8981\u52a8 -> emergency_stop. "
@@ -182,7 +183,11 @@ class LlmReactAgent(RuleReactAgent):
 
     def run_turn(self, envelope: DecisionEnvelope, messages: list[dict[str, Any]], turn: int) -> ToolCall:
         data = self._post(messages)
+        if data.get("type") == "finish":
+            return ToolCall(tool="finish", args={"final": data.get("final", "done"), "order": turn, "wait_until": "completed", "confidence": 1.0})
         item = data.get("tool_call")
+        if data.get("type") == "tool_call" and isinstance(item, dict):
+            item = {"tool": item.get("tool") or item.get("name"), "args": item.get("args") or item.get("arguments") or {}}
         if item is None and isinstance(data.get("tool_calls"), list):
             calls = data.get("tool_calls") or []
             if len(calls) != 1:

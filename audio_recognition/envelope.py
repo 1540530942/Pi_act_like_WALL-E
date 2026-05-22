@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 ToolStatus = Literal["pending", "validated", "rejected", "executed", "failed"]
 TaskStatus = Literal["pending", "running", "completed", "failed", "cancelled", "rejected"]
-RouteKind = Literal["action", "face", "system", "none"]
+RouteKind = Literal["action", "face", "observation", "system", "none"]
 
 
 def build_envelope_id(prefix: str = "env") -> str:
@@ -43,6 +43,7 @@ class TaskStep(BaseModel):
 
 
 class DecisionEnvelope(BaseModel):
+    protocol_version: str = "react_v1_single_tool"
     envelope_id: str = Field(default_factory=build_envelope_id)
     device_id: str = Field("turbopi-01", max_length=80)
     source: str = Field("audio", max_length=80)
@@ -72,6 +73,7 @@ class DecisionEnvelope(BaseModel):
     observations: list[dict[str, Any]] = Field(default_factory=list)
     react_messages: list[dict[str, Any]] = Field(default_factory=list)
     react_turns: list[dict[str, Any]] = Field(default_factory=list)
+    source_chain: list[dict[str, Any]] = Field(default_factory=list)
     final_response: str = ""
     errors: list[dict[str, Any]] = Field(default_factory=list)
     raw: dict[str, Any] = Field(default_factory=dict)

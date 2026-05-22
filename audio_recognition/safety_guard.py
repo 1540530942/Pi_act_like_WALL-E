@@ -20,6 +20,14 @@ def _contains_any(text: str, words: tuple[str, ...]) -> bool:
     return any(word.lower() in lowered for word in words)
 
 
+def has_emergency_intent(text: str) -> bool:
+    return _contains_any(text or "", EMERGENCY_WORDS)
+
+
+def has_negative_intent(text: str) -> bool:
+    return _contains_any(text or "", NEGATIVE_WORDS)
+
+
 def _reject_task(task: TaskStep, reason: str) -> TaskStep:
     updated = task.model_copy(deep=True)
     updated.status = "rejected"
