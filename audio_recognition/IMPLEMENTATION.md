@@ -122,6 +122,7 @@ Files:
 envelope.py          DecisionEnvelope / ToolCall / TaskStep
 react_agent.py       LLM ReAct agent, one tool_call or finish per turn
 tool_call_adapter.py Qwen/OpenAI native tool_calls + legacy JSON normalization
+tool_schema.py       builds native tool schema from skill_catalog.json with safe fallback
 tool_validator.py    tool whitelist, skill whitelist, duration clipping/rejection
 safety_guard.py      negative instruction rejection, emergency_stop priority, sequence limits
 dispatcher.py        dry_run / cloud_queue / local_first-compatible dispatch wrapper
@@ -139,6 +140,7 @@ Each ReAct turn executes exactly one normalized tool_call or finish.
 If a model returns multiple tool_calls in one turn, only the first is executed.
 The raw assistant message is kept in trace; deferred tool_calls are recorded but are not written back into messages.
 Legacy content JSON remains supported as a fallback and is converted into the same internal turn shape.
+Tool schema is generated from the configured skill_catalog.json voice-safe skill ids, so adding/removing catalog skills updates Qwen tool enums without editing react_agent.py.
 ```
 
 Current default behavior keeps existing APIs stable:

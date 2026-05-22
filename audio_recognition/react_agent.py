@@ -14,11 +14,13 @@ try:
     from .face_router import is_face_skill
     from .planner import build_task_planner
     from .tool_call_adapter import normalize_legacy_json_to_react_turn, normalize_tool_calls_to_react_turn
+    from .tool_schema import build_react_tools_schema, tool_skill_groups
 except ImportError:
     from envelope import DecisionEnvelope, ToolCall, build_call_id
     from face_router import is_face_skill
     from planner import build_task_planner
     from tool_call_adapter import normalize_legacy_json_to_react_turn, normalize_tool_calls_to_react_turn
+    from tool_schema import build_react_tools_schema, tool_skill_groups
 
 
 SEQUENCE_SPLIT_PATTERN = re.compile(r"(?:\u7136\u540e|\u518d|\u63a5\u7740|\u4e4b\u540e|\uff0c|,|;|\uff1b)")
@@ -97,16 +99,10 @@ class LlmReactAgent(RuleReactAgent):
             raise RuntimeError("react_agent.llm.endpoint and model are required")
 
     def _system_prompt(self) -> str:
+        groups = tool_skill_groups(self.catalog_path)
         allowed = {
-            "dispatch_action": [
-                "move_forward", "move_backward", "move_left", "move_right",
-                "turn_left", "turn_right", "look_left", "look_right",
-                "look_up", "look_down", "reset_pose",
-            ],
-            "dispatch_face": [
-                "face_neutral", "face_happy", "face_joy", "face_sad",
-                "face_angry", "face_speak", "face_mouth_open", "face_blink", "face_reset",
-            ],
+            "dispatch_action": groups["action"],
+            "dispatch_face": groups["face"],
             "camera_snapshot": ["camera_snapshot"],
             "get_robot_state": ["get_robot_state"],
             "ask_confirmation": ["ask_confirmation"],
@@ -142,102 +138,7 @@ class LlmReactAgent(RuleReactAgent):
         )
 
     def _tools_schema(self) -> list[dict[str, Any]]:
-        action_skills = [
-            "move_forward", "move_backward", "move_left", "move_right",
-            "turn_left", "turn_right", "look_left", "look_right",
-            "look_up", "look_down", "reset_pose",
-        ]
-        face_skills = [
-            "face_neutral", "face_happy", "face_joy", "face_sad",
-            "face_angry", "face_speak", "face_mouth_open", "face_blink", "face_reset",
-        ]
-        common = {
-            "order": {"type": "integer", "minimum": 1},
-            "wait_until": {"type": "string", "enum": ["accepted", "completed"]},
-            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-            "text": {"type": "string"},
-        }
-        return [
-            {
-                "type": "function",
-                "function": {
-                    "name": "dispatch_action",
-                    "description": "Execute one bounded robot motion or pose skill.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "skill_id": {"type": "string", "enum": action_skills},
-                            "duration_ms": {"type": "integer", "minimum": 0, "maximum": 1000},
-                            **common,
-                        },
-                        "required": ["skill_id"],
-                        "additionalProperties": False,
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "dispatch_face",
-                    "description": "Execute one face expression skill.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "skill_id": {"type": "string", "enum": face_skills},
-                            "duration_ms": {"type": "integer", "minimum": 0, "maximum": 5000},
-                            **common,
-                        },
-                        "required": ["skill_id"],
-                        "additionalProperties": False,
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "camera_snapshot",
-                    "description": "Capture a camera observation before deciding the next action.",
-                    "parameters": {"type": "object", "properties": {"reason": {"type": "string"}, **common}, "additionalProperties": False},
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "get_robot_state",
-                    "description": "Read robot health/state before deciding the next action.",
-                    "parameters": {"type": "object", "properties": {"reason": {"type": "string"}, **common}, "additionalProperties": False},
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "ask_confirmation",
-                    "description": "Ask the user for confirmation when an instruction is ambiguous.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"question": {"type": "string"}, "timeout_s": {"type": "integer", "minimum": 1, "maximum": 60}, **common},
-                        "required": ["question"],
-                        "additionalProperties": False,
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "emergency_stop",
-                    "description": "Immediately stop robot motion.",
-                    "parameters": {"type": "object", "properties": {"skill_id": {"type": "string", "enum": ["emergency_stop"]}, **common}, "additionalProperties": False},
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "finish",
-                    "description": "Finish the ReAct loop when all requested positive commands are handled.",
-                    "parameters": {"type": "object", "properties": {"final": {"type": "string"}}, "additionalProperties": False},
-                },
-            },
-        ]
+        return build_react_tools_schema(self.catalog_path)
 
     def _parse_response(self, text: str) -> dict[str, Any]:
         stripped = text.strip()

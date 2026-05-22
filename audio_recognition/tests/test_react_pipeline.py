@@ -11,6 +11,7 @@ from audio_recognition.envelope import DecisionEnvelope, ToolCall
 from audio_recognition.envelope_store import load_envelope, save_envelope
 from audio_recognition.pipeline import decide_transcript, route_transcript
 from audio_recognition.replay import replay_envelope
+from audio_recognition.tool_schema import build_react_tools_schema, tool_skill_groups
 from audio_recognition.tool_validator import validate_tool_calls
 
 
@@ -141,6 +142,43 @@ def finish_response(order: int = 2) -> Mock:
 
 
 class ReactPipelineTest(unittest.TestCase):
+    def test_tool_schema_is_generated_from_skill_catalog(self) -> None:
+        schema = build_react_tools_schema(CATALOG_PATH)
+        functions = {item["function"]["name"]: item["function"] for item in schema}
+        action_enum = functions["dispatch_action"]["parameters"]["properties"]["skill_id"]["enum"]
+        face_enum = functions["dispatch_face"]["parameters"]["properties"]["skill_id"]["enum"]
+        self.assertIn("move_forward", action_enum)
+        self.assertIn("look_up", action_enum)
+        self.assertIn("face_happy", face_enum)
+        self.assertNotIn("face_happy", action_enum)
+        self.assertNotIn("emergency_stop", action_enum)
+
+    def test_tool_schema_excludes_catalog_skills_outside_voice_allowlist(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            catalog_path = Path(tmp) / "skill_catalog.json"
+            catalog_path.write_text(
+                json.dumps(
+                    {
+                        "skills": [
+                            {"id": "move_forward", "name_zh": "前进"},
+                            {"id": "remote_shutdown", "name_zh": "关机"},
+                            {"id": "face_happy", "name_zh": "开心"},
+                        ]
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            groups = tool_skill_groups(catalog_path)
+        self.assertEqual(groups["action"], ["move_forward"])
+        self.assertEqual(groups["face"], ["face_happy"])
+        self.assertNotIn("remote_shutdown", groups["action"])
+
+    def test_tool_schema_uses_safe_fallback_when_catalog_is_missing(self) -> None:
+        groups = tool_skill_groups(BASE_DIR / "missing-skill-catalog.json")
+        self.assertIn("move_forward", groups["action"])
+        self.assertIn("face_happy", groups["face"])
+
     def test_simple_command_generates_envelope_tool_task_and_dry_run(self) -> None:
         with patch("audio_recognition.react_agent.requests.post", side_effect=[action_response("move_forward", text="前进"), finish_response()]):
             envelope = decide_transcript(
