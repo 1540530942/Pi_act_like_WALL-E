@@ -29,6 +29,33 @@ def llm_response(payload: dict) -> Mock:
     return response
 
 
+def native_llm_message(message: dict) -> Mock:
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {"choices": [{"message": message}]}
+    return response
+
+
+def native_tool_response(tool: str, args: dict, *, call_id: str = "call_native_1") -> Mock:
+    return native_llm_message(
+        {
+            "role": "assistant",
+            "content": None,
+            "tool_calls": [
+                {
+                    "id": call_id,
+                    "type": "function",
+                    "function": {"name": tool, "arguments": json.dumps(args, ensure_ascii=False)},
+                }
+            ],
+        }
+    )
+
+
+def native_finish_response(content: str = "done") -> Mock:
+    return native_llm_message({"role": "assistant", "content": content})
+
+
 def action_response(skill_id: str, *, text: str = "", order: int = 1, duration_ms: int = 800) -> Mock:
     return llm_response(
         {
@@ -59,12 +86,44 @@ def observation_response(tool: str, *, order: int = 1) -> Mock:
 
 
 def multi_tool_response() -> Mock:
-    return llm_response(
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "call_first",
+                            "type": "function",
+                            "function": {"name": "dispatch_action", "arguments": json.dumps({"skill_id": "move_forward"})},
+                        },
+                        {
+                            "id": "call_second",
+                            "type": "function",
+                            "function": {"name": "dispatch_action", "arguments": json.dumps({"skill_id": "turn_right"})},
+                        },
+                    ],
+                }
+            }
+        ]
+    }
+    return response
+
+
+def invalid_native_arguments_response() -> Mock:
+    return native_llm_message(
         {
-            "protocol_version": "react_v1_single_tool",
+            "role": "assistant",
+            "content": None,
             "tool_calls": [
-                {"tool": "dispatch_action", "args": {"skill_id": "move_forward"}},
-                {"tool": "dispatch_action", "args": {"skill_id": "turn_right"}},
+                {
+                    "id": "call_bad_args",
+                    "type": "function",
+                    "function": {"name": "dispatch_action", "arguments": "{bad json"},
+                }
             ],
         }
     )
@@ -117,6 +176,39 @@ class ReactPipelineTest(unittest.TestCase):
             )
         self.assertEqual([task.skill_id for task in envelope.tasks], ["move_forward", "turn_right"])
         self.assertEqual([task.order for task in envelope.tasks], [1, 2])
+
+    def test_native_tool_call_is_normalized_to_internal_tool_call(self) -> None:
+        with patch(
+            "audio_recognition.react_agent.requests.post",
+            side_effect=[
+                native_tool_response(
+                    "dispatch_action",
+                    {
+                        "skill_id": "move_forward",
+                        "duration_ms": 500,
+                        "wait_until": "completed",
+                        "confidence": 0.95,
+                        "text": "前进",
+                    },
+                    call_id="call_native_forward",
+                ),
+                native_finish_response("done"),
+            ],
+        ):
+            envelope = decide_transcript(
+                base_dir=BASE_DIR,
+                text="前进",
+                router_config=ROUTER_CONFIG,
+                cloud_config={},
+                dispatch_mode="dry_run",
+                source="unit",
+            )
+        self.assertEqual(envelope.tool_calls[0].call_id, "call_native_forward")
+        self.assertEqual(envelope.tasks[0].skill_id, "move_forward")
+        self.assertEqual(envelope.final_response, "done")
+        self.assertEqual(envelope.errors, [])
+        self.assertEqual(envelope.react_messages[3]["tool_call_id"], "call_native_forward")
+        self.assertEqual(envelope.react_turns[0]["message_for_history"]["tool_calls"][0]["id"], "call_native_forward")
 
     def test_negative_instruction_is_rejected_by_safety(self) -> None:
         with patch("audio_recognition.react_agent.requests.post", side_effect=[action_response("move_forward", text="不要前进")]):
@@ -294,8 +386,8 @@ class ReactPipelineTest(unittest.TestCase):
         self.assertEqual(envelope.observations[0]["status"], "pending")
         self.assertEqual(envelope.observations[0]["data"]["question"], "\u8981\u524d\u8fdb\u5417\uff1f")
 
-    def test_multiple_tool_calls_are_rejected_by_single_tool_protocol(self) -> None:
-        with patch("audio_recognition.react_agent.requests.post", return_value=multi_tool_response()):
+    def test_multiple_native_tool_calls_are_collapsed_to_first_and_deferred(self) -> None:
+        with patch("audio_recognition.react_agent.requests.post", side_effect=[multi_tool_response(), finish_response(2)]):
             envelope = decide_transcript(
                 base_dir=BASE_DIR,
                 text="\u524d\u8fdb\u7136\u540e\u53f3\u8f6c",
@@ -304,9 +396,24 @@ class ReactPipelineTest(unittest.TestCase):
                 dispatch_mode="dry_run",
                 source="unit",
             )
+        self.assertEqual([task.skill_id for task in envelope.tasks], ["move_forward"])
+        self.assertEqual(envelope.react_turns[0]["deferred_tool_calls"][0]["id"], "call_second")
+        self.assertIn("multiple_tool_calls_collapsed_to_first", envelope.react_turns[0]["warnings"])
+        self.assertEqual(len(envelope.react_turns[0]["message_for_history"]["tool_calls"]), 1)
+
+    def test_invalid_native_tool_arguments_records_agent_error(self) -> None:
+        with patch("audio_recognition.react_agent.requests.post", return_value=invalid_native_arguments_response()):
+            envelope = decide_transcript(
+                base_dir=BASE_DIR,
+                text="\u524d\u8fdb",
+                router_config=ROUTER_CONFIG,
+                cloud_config={},
+                dispatch_mode="dry_run",
+                source="unit",
+            )
         self.assertEqual(envelope.tasks, [])
         self.assertEqual(envelope.dispatch_results, [])
-        self.assertIn("exactly one tool_call", envelope.errors[0]["message"])
+        self.assertIn("invalid_function_arguments_json", envelope.errors[0]["message"])
 
     def test_llm_react_agent_generates_sequence_without_rule_fallback(self) -> None:
         with patch(

@@ -12,6 +12,7 @@ try:
     from .observation_executor import OBSERVATION_TOOLS, execute_observation_tool
     from .react_agent import build_llm_react_agent, run_react_agent
     from .safety_guard import has_emergency_intent, run_safety_guard, run_safety_guard_for_task
+    from .tool_call_adapter import build_tool_result_message
     from .tool_validator import validate_tool_call, validate_tool_calls
 except ImportError:
     from contracts import PlannedTask
@@ -22,6 +23,7 @@ except ImportError:
     from observation_executor import OBSERVATION_TOOLS, execute_observation_tool
     from react_agent import build_llm_react_agent, run_react_agent
     from safety_guard import has_emergency_intent, run_safety_guard, run_safety_guard_for_task
+    from tool_call_adapter import build_tool_result_message
     from tool_validator import validate_tool_call, validate_tool_calls
 
 
@@ -132,9 +134,38 @@ def decide_transcript(
         except Exception as exc:  # noqa: BLE001
             envelope.add_error("react_agent", str(exc), {"turn": turn})
             break
+        decision = dict(getattr(agent, "last_decision", {}) or {})
         envelope.tool_calls.append(call)
-        messages.append({"role": "assistant", "content": __import__("json").dumps({"tool_call": call.model_dump(), "reasoning_summary": envelope.reasoning_summary}, ensure_ascii=False)})
-        envelope.react_turns.append({"turn": turn, "assistant_tool_call": call.model_dump()})
+        message_for_history = decision.get("message_for_history")
+        if isinstance(message_for_history, dict):
+            messages.append(message_for_history)
+        else:
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": call.call_id,
+                            "type": "function",
+                            "function": {
+                                "name": call.tool,
+                                "arguments": __import__("json").dumps(call.args, ensure_ascii=False),
+                            },
+                        }
+                    ],
+                }
+            )
+        turn_record = {
+            "turn": turn,
+            "assistant_tool_call": call.model_dump(),
+            "raw_assistant_message": decision.get("raw_assistant_message"),
+            "message_for_history": message_for_history,
+            "deferred_tool_calls": decision.get("deferred_tool_calls", []),
+            "deferred_policy": decision.get("deferred_policy", ""),
+            "warnings": decision.get("warnings", []),
+        }
+        envelope.react_turns.append(turn_record)
         if call.tool == "finish":
             envelope.final_response = str(call.args.get("message") or call.args.get("final") or "done")
             validate_tool_call(envelope, call)
@@ -146,7 +177,7 @@ def decide_transcript(
                 tool_result = {"ok": observation.get("status") != "failed", "observation": observation}
             else:
                 tool_result = {"ok": False, "error": "tool_call_rejected", "tool": call.tool}
-            messages.append({"role": "tool", "content": __import__("json").dumps(tool_result, ensure_ascii=False)})
+            messages.append(build_tool_result_message(call.call_id, call.tool, tool_result))
             envelope.react_turns[-1]["tool_result"] = tool_result
             continue
         checked_task = run_safety_guard_for_task(envelope, task)
@@ -155,17 +186,18 @@ def decide_transcript(
             task.error = checked_task.error
             result = {"task_id": task.task_id, "skill_id": task.skill_id, "status": "rejected", "error": task.error}
             envelope.dispatch_results.append(result)
-            messages.append({"role": "tool", "content": __import__("json").dumps(result, ensure_ascii=False)})
+            messages.append(build_tool_result_message(call.call_id, call.tool, result))
             envelope.react_turns[-1]["tool_result"] = result
             continue
         result = dispatch_task(envelope, task, cloud_config=cloud_config or {}, source=source, dispatch_mode=dispatch_mode)
-        messages.append({"role": "tool", "content": __import__("json").dumps(result, ensure_ascii=False)})
+        messages.append(build_tool_result_message(call.call_id, call.tool, result))
         envelope.react_turns[-1]["tool_result"] = result
         envelope.react_messages = list(messages)
         if result.get("status") not in {"completed", "dry_run"} or task.skill_id == "emergency_stop":
             break
     else:
         envelope.add_error("react_agent", "max_steps_exceeded", {"max_steps": max_steps})
+    envelope.react_messages = list(messages)
     envelope.t_agent_end = __import__("time").time()
     return envelope
 

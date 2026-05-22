@@ -121,6 +121,7 @@ Files:
 ```text
 envelope.py          DecisionEnvelope / ToolCall / TaskStep
 react_agent.py       LLM ReAct agent, one tool_call or finish per turn
+tool_call_adapter.py Qwen/OpenAI native tool_calls + legacy JSON normalization
 tool_validator.py    tool whitelist, skill whitelist, duration clipping/rejection
 safety_guard.py      negative instruction rejection, emergency_stop priority, sequence limits
 dispatcher.py        dry_run / cloud_queue / local_first-compatible dispatch wrapper
@@ -133,8 +134,11 @@ Protocol:
 
 ```text
 protocol_version = react_v1_single_tool
-Each LLM turn may return exactly one tool_call or finish.
-Bulk tool_calls are rejected and recorded in envelope.errors.
+Qwen/OpenAI native message.tool_calls are preferred.
+Each ReAct turn executes exactly one normalized tool_call or finish.
+If a model returns multiple tool_calls in one turn, only the first is executed.
+The raw assistant message is kept in trace; deferred tool_calls are recorded but are not written back into messages.
+Legacy content JSON remains supported as a fallback and is converted into the same internal turn shape.
 ```
 
 Current default behavior keeps existing APIs stable:

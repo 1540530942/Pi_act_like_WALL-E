@@ -10,13 +10,15 @@ from typing import Any
 import requests
 
 try:
-    from .envelope import DecisionEnvelope, ToolCall
+    from .envelope import DecisionEnvelope, ToolCall, build_call_id
     from .face_router import is_face_skill
     from .planner import build_task_planner
+    from .tool_call_adapter import normalize_legacy_json_to_react_turn, normalize_tool_calls_to_react_turn
 except ImportError:
-    from envelope import DecisionEnvelope, ToolCall
+    from envelope import DecisionEnvelope, ToolCall, build_call_id
     from face_router import is_face_skill
     from planner import build_task_planner
+    from tool_call_adapter import normalize_legacy_json_to_react_turn, normalize_tool_calls_to_react_turn
 
 
 SEQUENCE_SPLIT_PATTERN = re.compile(r"(?:\u7136\u540e|\u518d|\u63a5\u7740|\u4e4b\u540e|\uff0c|,|;|\uff1b)")
@@ -89,6 +91,8 @@ class LlmReactAgent(RuleReactAgent):
         self.timeout = float(llm_config.get("timeout_seconds") or os.getenv("AUDIO_REACT_LLM_TIMEOUT_SECONDS") or 90)
         self.verify_ssl = bool(llm_config.get("verify_ssl", True))
         self.retries = int(llm_config.get("retries") or os.getenv("AUDIO_REACT_LLM_RETRIES") or 2)
+        self.use_response_format = bool(llm_config.get("response_format_json") or os.getenv("AUDIO_REACT_LLM_RESPONSE_FORMAT_JSON"))
+        self.last_decision: dict[str, Any] = {}
         if not self.endpoint or not self.model:
             raise RuntimeError("react_agent.llm.endpoint and model are required")
 
@@ -103,6 +107,9 @@ class LlmReactAgent(RuleReactAgent):
                 "face_neutral", "face_happy", "face_joy", "face_sad",
                 "face_angry", "face_speak", "face_mouth_open", "face_blink", "face_reset",
             ],
+            "camera_snapshot": ["camera_snapshot"],
+            "get_robot_state": ["get_robot_state"],
+            "ask_confirmation": ["ask_confirmation"],
             "emergency_stop": ["emergency_stop"],
             "finish": ["finish"],
         }
@@ -122,15 +129,115 @@ class LlmReactAgent(RuleReactAgent):
             "final": "only for finish",
         }
         return (
-            "Output only compact JSON. protocol_version=react_v1_single_tool. No Thinking Process. One ReAct turn equals one tool_call. "
+            "Prefer native OpenAI-style tool_calls. If native tool calling is unavailable, output only compact JSON. "
+            "protocol_version=react_v1_single_tool. No Thinking Process. One ReAct turn equals one tool_call. "
             "After a completed/dry_run tool result, choose the next unfinished positive command; output finish when done. "
             "Negated fragments such as \u4e0d\u8981/\u522b/\u4e0d\u8bb8/\u4e0d\u7528 do not create that action and do not cancel previous completed actions. "
             "\u505c\u6b62/\u6025\u505c/\u522b\u52a8/\u4e0d\u8981\u52a8 -> emergency_stop. "
             "\u5f80\u524d\u8d70=move_forward; \u5f80\u540e\u8d70=move_backward; \u62ac\u5934\u770b=look_up; \u4f4e\u5934\u770b=look_down. "
             "tool_call.args.text must be the minimal source fragment for only this step. "
+            "Observation tools must be used before action when current state or camera evidence is required. "
             f"Allowed: {json.dumps(allowed, ensure_ascii=False)}. "
             f"Schema: {json.dumps(schema, ensure_ascii=False)}."
         )
+
+    def _tools_schema(self) -> list[dict[str, Any]]:
+        action_skills = [
+            "move_forward", "move_backward", "move_left", "move_right",
+            "turn_left", "turn_right", "look_left", "look_right",
+            "look_up", "look_down", "reset_pose",
+        ]
+        face_skills = [
+            "face_neutral", "face_happy", "face_joy", "face_sad",
+            "face_angry", "face_speak", "face_mouth_open", "face_blink", "face_reset",
+        ]
+        common = {
+            "order": {"type": "integer", "minimum": 1},
+            "wait_until": {"type": "string", "enum": ["accepted", "completed"]},
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+            "text": {"type": "string"},
+        }
+        return [
+            {
+                "type": "function",
+                "function": {
+                    "name": "dispatch_action",
+                    "description": "Execute one bounded robot motion or pose skill.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "skill_id": {"type": "string", "enum": action_skills},
+                            "duration_ms": {"type": "integer", "minimum": 0, "maximum": 1000},
+                            **common,
+                        },
+                        "required": ["skill_id"],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "dispatch_face",
+                    "description": "Execute one face expression skill.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "skill_id": {"type": "string", "enum": face_skills},
+                            "duration_ms": {"type": "integer", "minimum": 0, "maximum": 5000},
+                            **common,
+                        },
+                        "required": ["skill_id"],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "camera_snapshot",
+                    "description": "Capture a camera observation before deciding the next action.",
+                    "parameters": {"type": "object", "properties": {"reason": {"type": "string"}, **common}, "additionalProperties": False},
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_robot_state",
+                    "description": "Read robot health/state before deciding the next action.",
+                    "parameters": {"type": "object", "properties": {"reason": {"type": "string"}, **common}, "additionalProperties": False},
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "ask_confirmation",
+                    "description": "Ask the user for confirmation when an instruction is ambiguous.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"question": {"type": "string"}, "timeout_s": {"type": "integer", "minimum": 1, "maximum": 60}, **common},
+                        "required": ["question"],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "emergency_stop",
+                    "description": "Immediately stop robot motion.",
+                    "parameters": {"type": "object", "properties": {"skill_id": {"type": "string", "enum": ["emergency_stop"]}, **common}, "additionalProperties": False},
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "finish",
+                    "description": "Finish the ReAct loop when all requested positive commands are handled.",
+                    "parameters": {"type": "object", "properties": {"final": {"type": "string"}}, "additionalProperties": False},
+                },
+            },
+        ]
 
     def _parse_response(self, text: str) -> dict[str, Any]:
         stripped = text.strip()
@@ -154,9 +261,12 @@ class LlmReactAgent(RuleReactAgent):
             "messages": messages,
             "temperature": 0,
             "max_tokens": 1200,
-            "response_format": {"type": "json_object"},
+            "tools": self._tools_schema(),
+            "tool_choice": "auto",
             "chat_template_kwargs": {"enable_thinking": False},
         }
+        if self.use_response_format:
+            payload["response_format"] = {"type": "json_object"}
         response = None
         last_error: Exception | None = None
         for attempt in range(max(self.retries, 1)):
@@ -172,36 +282,62 @@ class LlmReactAgent(RuleReactAgent):
         if response is None:
             raise RuntimeError(str(last_error or "empty llm response"))
         raw = response.json()
+        choices = (raw.get("raw") or {}).get("choices") if isinstance(raw.get("raw"), dict) else raw.get("choices")
+        choice_message: dict[str, Any] | None = None
+        if choices:
+            message = ((choices[0] or {}).get("message") or {})
+            choice_message = message if isinstance(message, dict) else None
+            if choice_message and choice_message.get("tool_calls"):
+                data = normalize_tool_calls_to_react_turn(choice_message)
+                data["_raw"] = raw
+                return data
         text = str(raw.get("text") or "")
         if not text:
-            choices = (raw.get("raw") or {}).get("choices") if isinstance(raw.get("raw"), dict) else raw.get("choices")
             if choices:
-                text = str(((choices[0] or {}).get("message") or {}).get("content") or "")
-        data = self._parse_response(text)
+                text = str((choice_message or {}).get("content") or "")
+                if not text and choice_message:
+                    data = normalize_tool_calls_to_react_turn(choice_message)
+                    data["_raw"] = raw
+                    return data
+        try:
+            data = self._parse_response(text)
+        except Exception:
+            if choice_message is not None:
+                data = normalize_tool_calls_to_react_turn(choice_message)
+                data["_raw"] = raw
+                return data
+            raise
+        data = normalize_legacy_json_to_react_turn(data)
         data["_raw"] = raw
         return data
 
     def run_turn(self, envelope: DecisionEnvelope, messages: list[dict[str, Any]], turn: int) -> ToolCall:
         data = self._post(messages)
+        self.last_decision = data
+        envelope.raw.setdefault("react_llm_turns", []).append(
+            {
+                "turn": turn,
+                "model": self.model,
+                "raw": data.get("_raw", {}),
+                "normalized": {key: value for key, value in data.items() if key != "_raw"},
+            }
+        )
+        if data.get("type") == "error":
+            error = data.get("error") if isinstance(data.get("error"), dict) else {}
+            raise ValueError(str(error.get("message") or "LLM output is invalid"))
         if data.get("type") == "finish":
             return ToolCall(tool="finish", args={"final": data.get("final", "done"), "order": turn, "wait_until": "completed", "confidence": 1.0})
         item = data.get("tool_call")
         if data.get("type") == "tool_call" and isinstance(item, dict):
             item = {"tool": item.get("tool") or item.get("name"), "args": item.get("args") or item.get("arguments") or {}}
-        if item is None and isinstance(data.get("tool_calls"), list):
-            calls = data.get("tool_calls") or []
-            if len(calls) != 1:
-                raise ValueError("LLM must return exactly one tool_call per turn")
-            item = calls[0]
         if not isinstance(item, dict):
             raise ValueError("LLM response missing tool_call")
         args = dict(item.get("args") or {})
         args.setdefault("order", turn)
         args.setdefault("wait_until", "completed")
         args.setdefault("confidence", 0.9)
-        call = ToolCall(tool=str(item.get("tool") or ""), args=args)
+        call = ToolCall(call_id=str(data.get("raw_tool_call_id") or data.get("call_id") or build_call_id()), tool=str(item.get("tool") or ""), args=args)
         envelope.reasoning_summary = str(data.get("reasoning_summary") or envelope.reasoning_summary)
-        envelope.raw.setdefault("react_llm_turns", []).append({"turn": turn, "model": self.model, "raw": data.get("_raw", {})})
         return call
 
     def run(self, envelope: DecisionEnvelope) -> DecisionEnvelope:
