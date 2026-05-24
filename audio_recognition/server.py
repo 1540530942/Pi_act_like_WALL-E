@@ -116,14 +116,15 @@ def build_router_config() -> dict[str, Any]:
         "skill_registry": str(os.getenv("AUDIO_SKILL_REGISTRY", str(SKILL_REGISTRY_PATH))).strip(),
     }
     react_llm = {
-        "endpoint": str(os.getenv("AUDIO_REACT_LLM_ENDPOINT", "https://www.wangyutang.cn/common/api/llm/chat")).strip(),
-        "model": str(os.getenv("AUDIO_REACT_LLM_MODEL", "qwen3.5-9b")).strip(),
+        "endpoint": str(os.getenv("AUDIO_REACT_LLM_ENDPOINT", "https://www.wangyutang.cn/common/api/llm/qwen3-32b/chat/completions")).strip(),
+        "model": str(os.getenv("AUDIO_REACT_LLM_MODEL", "qwen3-32b")).strip(),
         "timeout_seconds": float(os.getenv("AUDIO_REACT_LLM_TIMEOUT_SECONDS", "90") or 90),
         "retries": int(os.getenv("AUDIO_REACT_LLM_RETRIES", "2") or 2),
     }
     config["react_agent"] = {
         "mode": str(os.getenv("AUDIO_REACT_AGENT_MODE", "llm") or "llm").strip().lower(),
         "max_steps": int(os.getenv("AUDIO_REACT_MAX_STEPS", "8") or 8),
+        "prompt_path": str(os.getenv("AUDIO_REACT_SYSTEM_PROMPT", "prompts/walle_system_prompt.md") or "prompts/walle_system_prompt.md").strip(),
         "llm": react_llm,
     }
     return config

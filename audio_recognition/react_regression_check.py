@@ -14,7 +14,8 @@ if __package__ in {None, ""}:
 from audio_recognition.pipeline import decide_transcript
 
 
-DEFAULT_TEXT = "\u524d\u8fdb\u3001\u5411\u53f3\u8f6c\u4e00\u4e0b\uff0c\u8bb0\u5f97\u540e\u9000\uff0c\u522b\u5fd8\u4e86\u62ac\u5934\u770b"
+DEFAULT_TEXT = "\u5148\u524d\u8fdb\u518d\u5411\u4e0a\u770b"
+SECOND_TEXT = "\u5de6\u8f6c\uff0c\u4e0d\u8981\u5f80\u4e0a\u770b"
 EMERGENCY_TEXT = "\u4e0d\u8981\u52a8\u3001\u5411\u53f3\u8f6c\u4e00\u4e0b"
 
 
@@ -41,11 +42,12 @@ def build_config(base_dir: Path, args: argparse.Namespace) -> dict[str, Any]:
         "model": args.llm_model,
         "timeout_seconds": args.llm_timeout,
         "verify_ssl": False,
-        "retries": 1,
+        "retries": args.llm_retries,
     }
     return {
-        "skill_catalog": str((base_dir / "tests" / "skill_catalog.fixture.json").resolve()),
-        "react_agent": {"mode": "llm", "max_steps": args.max_steps, "llm": llm},
+        "skill_registry": str((base_dir / "skills" / "registry.yaml").resolve()),
+        "skill_catalog": str((base_dir.parent / "action_move" / "skill_catalog.json").resolve()),
+        "react_agent": {"mode": "llm", "max_steps": args.max_steps, "prompt_path": "prompts/walle_system_prompt.md", "llm": llm},
     }
 
 
@@ -75,11 +77,13 @@ def summarize_envelope(envelope) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run ReAct regression checks without needing the web UI.")
-    parser.add_argument("--llm-endpoint", default="http://127.0.0.1:18002/v1/chat/completions")
-    parser.add_argument("--llm-model", default="qwen3.5-9b")
+    parser.add_argument("--llm-endpoint", default="https://www.wangyutang.cn/common/api/llm/qwen3-32b/chat/completions")
+    parser.add_argument("--llm-model", default="qwen3-32b")
     parser.add_argument("--llm-timeout", type=float, default=140)
+    parser.add_argument("--llm-retries", type=int, default=2)
     parser.add_argument("--action-server", default="http://127.0.0.1:18765")
     parser.add_argument("--text", default=DEFAULT_TEXT)
+    parser.add_argument("--second-text", default=SECOND_TEXT)
     parser.add_argument("--max-steps", type=int, default=8)
     parser.add_argument("--real", action="store_true", help="execute action tool calls on the Pi via local_first")
     parser.add_argument("--skip-llm", action="store_true", help="only run preflight emergency and observation checks")
@@ -140,7 +144,17 @@ def main() -> int:
         dispatch_mode=mode,
         source="react-regression",
     )
-    print_section(f"react_{mode}", summarize_envelope(envelope))
+    print_section(f"react_{mode}_primary", summarize_envelope(envelope))
+
+    second_envelope = decide_transcript(
+        base_dir=base_dir,
+        text=args.second_text,
+        router_config=config,
+        cloud_config=cloud,
+        dispatch_mode=mode,
+        source="react-regression",
+    )
+    print_section(f"react_{mode}_second", summarize_envelope(second_envelope))
 
     if args.real:
         try:
@@ -151,7 +165,7 @@ def main() -> int:
             print_section("post_real_stop_error", {"error": str(exc)})
             return 4
 
-    if envelope.errors:
+    if envelope.errors or second_envelope.errors:
         return 5
     return 0
 

@@ -94,7 +94,7 @@ def decide_transcript(
         envelope.react_turns.append({"turn": 0, "assistant_tool_call": call.model_dump(), "preflight": True})
         task = validate_tool_call(envelope, call, registry_path=registry_path, catalog_path=catalog_path)
         if task:
-            checked_task = run_safety_guard_for_task(envelope, task)
+            checked_task = run_safety_guard_for_task(envelope, task, registry_path=registry_path, catalog_path=catalog_path)
             if checked_task.status == "rejected":
                 task.status = checked_task.status
                 task.error = checked_task.error
@@ -171,7 +171,7 @@ def decide_transcript(
             messages.append(build_tool_result_message(call.call_id, call.tool, tool_result))
             envelope.react_turns[-1]["tool_result"] = tool_result
             continue
-        checked_task = run_safety_guard_for_task(envelope, task)
+        checked_task = run_safety_guard_for_task(envelope, task, registry_path=registry_path, catalog_path=catalog_path)
         if checked_task.status == "rejected":
             task.status = checked_task.status
             task.error = checked_task.error

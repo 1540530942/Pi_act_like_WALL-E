@@ -66,6 +66,7 @@ def build_react_tools_schema(registry_path: str | Path | None = None, catalog_pa
                     "properties": {
                         "skill_id": {"type": "string", "enum": [spec.skill_id for spec in face_skills]},
                         "duration_ms": {"type": "integer", "minimum": 0, "maximum": face_max},
+                        "intensity": {"type": "number", "minimum": 0, "maximum": 1},
                         **common,
                     },
                     "required": ["skill_id"],
@@ -78,7 +79,23 @@ def build_react_tools_schema(registry_path: str | Path | None = None, catalog_pa
             "function": {
                 "name": "camera_snapshot",
                 "description": "Capture a camera observation before deciding the next action.",
-                "parameters": {"type": "object", "properties": {"reason": {"type": "string"}, **common}, "additionalProperties": False},
+                "parameters": {
+                    "type": "object",
+                    "properties": {"focus": {"type": "string"}, "purpose": {"type": "string"}, "reason": {"type": "string"}, **common},
+                    "additionalProperties": False,
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "front_distance",
+                "description": "Read the latest front distance estimate before deciding whether forward motion is safe.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"focus": {"type": "string"}, "purpose": {"type": "string"}, **common},
+                    "additionalProperties": False,
+                },
             },
         },
         {
@@ -96,7 +113,12 @@ def build_react_tools_schema(registry_path: str | Path | None = None, catalog_pa
                 "description": "Ask the user for confirmation when an instruction is ambiguous.",
                 "parameters": {
                     "type": "object",
-                    "properties": {"question": {"type": "string"}, "timeout_s": {"type": "integer", "minimum": 1, "maximum": 60}, **common},
+                    "properties": {
+                        "question": {"type": "string"},
+                        "timeout_ms": {"type": "integer", "minimum": 1000, "maximum": 60000},
+                        "timeout_s": {"type": "integer", "minimum": 1, "maximum": 60},
+                        **common,
+                    },
                     "required": ["question"],
                     "additionalProperties": False,
                 },
@@ -115,7 +137,7 @@ def build_react_tools_schema(registry_path: str | Path | None = None, catalog_pa
             "function": {
                 "name": "finish",
                 "description": "Finish the ReAct loop when all requested positive commands are handled.",
-                "parameters": {"type": "object", "properties": {"final": {"type": "string"}}, "additionalProperties": False},
+                "parameters": {"type": "object", "properties": {"message": {"type": "string"}, "final": {"type": "string"}}, "additionalProperties": False},
             },
         },
     ]

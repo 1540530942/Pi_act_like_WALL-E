@@ -19,9 +19,16 @@ except ImportError:
     from voice_intents import ALLOWED_VOICE_SKILL_IDS
 
 
-OBSERVATION_TOOLS = {"camera_snapshot", "get_robot_state", "ask_confirmation"}
+OBSERVATION_TOOLS = {"camera_snapshot", "front_distance", "get_robot_state", "ask_confirmation"}
 SYSTEM_TOOLS = {"finish"}
 DEFAULT_REGISTRY_RELATIVE_PATH = "skills/registry.yaml"
+DEFAULT_REGISTRY_DEFAULTS: dict[str, Any] = {
+    "max_action_duration_ms": 1000,
+    "max_turn_duration_ms": 800,
+    "max_face_duration_ms": 5000,
+    "observation_ttl_ms": {"camera_snapshot": 2000, "front_distance": 2000, "get_robot_state": 5000},
+    "safety_thresholds": {"min_front_distance_estimate_cm": 1},
+}
 
 
 @dataclass(frozen=True)
@@ -34,12 +41,15 @@ class SkillSpec:
     wait_until: str = "completed"
     enabled: bool = True
     aliases: tuple[str, ...] = ()
+    risk: str = "low"
+    pre_conditions: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
 class SkillRegistry:
     source: str
     skills: dict[str, SkillSpec]
+    defaults: dict[str, Any]
 
     def by_tool(self, tool: str) -> list[SkillSpec]:
         return sorted((spec for spec in self.skills.values() if spec.tool == tool and spec.enabled), key=lambda item: item.skill_id)
@@ -82,6 +92,31 @@ def resolve_registry_path(base_dir: Path, router_config: dict[str, Any] | None) 
     return registry_path
 
 
+def _normalize_defaults(defaults: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(DEFAULT_REGISTRY_DEFAULTS)
+    normalized["observation_ttl_ms"] = dict(DEFAULT_REGISTRY_DEFAULTS["observation_ttl_ms"])
+    normalized["safety_thresholds"] = dict(DEFAULT_REGISTRY_DEFAULTS["safety_thresholds"])
+    for key, value in defaults.items():
+        if isinstance(value, dict) and isinstance(normalized.get(key), dict):
+            nested = dict(normalized[key])
+            nested.update(value)
+            normalized[key] = nested
+        else:
+            normalized[key] = value
+    return normalized
+
+
+def _normalize_risk(value: Any) -> str:
+    risk = str(value or "low").strip().lower()
+    return risk if risk in {"low", "medium", "high"} else "low"
+
+
+def _normalize_pre_conditions(value: Any) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        return ()
+    return tuple(str(item).strip() for item in value if str(item).strip())
+
+
 def _tool_for_skill(skill_id: str, route: str) -> str:
     if skill_id == "emergency_stop":
         return "emergency_stop"
@@ -121,7 +156,8 @@ def _duration_limit(item: dict[str, Any], skill_id: str, route: str, defaults: d
 
 
 def _registry_from_data(data: dict[str, Any], source: str) -> SkillRegistry:
-    defaults = data.get("defaults") if isinstance(data.get("defaults"), dict) else {}
+    raw_defaults = data.get("defaults") if isinstance(data.get("defaults"), dict) else {}
+    defaults = _normalize_defaults(raw_defaults)
     skills: dict[str, SkillSpec] = {}
     for item in data.get("skills", []):
         if not isinstance(item, dict):
@@ -141,19 +177,23 @@ def _registry_from_data(data: dict[str, Any], source: str) -> SkillRegistry:
             max_duration_ms=max_duration,
             wait_until=str(item.get("wait_until") or "completed"),
             aliases=aliases,
+            risk=_normalize_risk(item.get("risk")),
+            pre_conditions=_normalize_pre_conditions(item.get("pre_conditions")),
         )
-    return SkillRegistry(source=source, skills=skills)
+    return SkillRegistry(source=source, skills=skills, defaults=defaults)
 
 
 def _registry_from_catalog(catalog_path: Path) -> SkillRegistry:
     catalog = load_catalog(catalog_path)
     defaults = catalog.get("defaults") if isinstance(catalog.get("defaults"), dict) else {}
     data: dict[str, Any] = {"defaults": {}, "skills": []}
-    data["defaults"] = {
-        "max_action_duration_ms": min(int(defaults.get("max_move_duration_ms") or 1000), 1000),
-        "max_turn_duration_ms": min(int(defaults.get("max_turn_duration_ms") or 800), 800),
-        "max_face_duration_ms": 5000,
-    }
+    data["defaults"] = _normalize_defaults(
+        {
+            "max_action_duration_ms": min(int(defaults.get("max_move_duration_ms") or 1000), 1000),
+            "max_turn_duration_ms": min(int(defaults.get("max_turn_duration_ms") or 800), 800),
+            "max_face_duration_ms": 5000,
+        }
+    )
     for item in catalog.get("skills", []):
         skill_id = str(item.get("id") or "").strip()
         if skill_id not in ALLOWED_VOICE_SKILL_IDS:
@@ -181,13 +221,14 @@ def _default_registry_data() -> dict[str, Any]:
         "face_angry", "face_speak", "face_mouth_open", "face_blink", "face_reset",
     ]
     skills = [
-        {"id": "emergency_stop", "route": "action", "tool": "emergency_stop", "max_duration_ms": 0},
-        *({"id": skill_id, "route": "action", "tool": "dispatch_action"} for skill_id in action_skills),
+        {"id": "emergency_stop", "route": "action", "tool": "emergency_stop", "max_duration_ms": 0, "risk": "low"},
+        {"id": "move_forward", "route": "action", "tool": "dispatch_action", "risk": "medium", "pre_conditions": ["recent_camera_snapshot", "front_distance_clear"]},
+        *({"id": skill_id, "route": "action", "tool": "dispatch_action"} for skill_id in action_skills if skill_id != "move_forward"),
         *({"id": skill_id, "route": "face", "tool": "dispatch_face"} for skill_id in face_skills),
     ]
     return {
         "version": 1,
-        "defaults": {"max_action_duration_ms": 1000, "max_turn_duration_ms": 800, "max_face_duration_ms": 5000},
+        "defaults": _normalize_defaults({}),
         "skills": skills,
     }
 
@@ -218,12 +259,15 @@ def export_registry_json(registry: SkillRegistry) -> str:
     return json.dumps(
         {
             "source": registry.source,
+            "defaults": registry.defaults,
             "skills": {
                 skill_id: {
                     "route": spec.route,
                     "tool": spec.tool,
                     "min_duration_ms": spec.min_duration_ms,
                     "max_duration_ms": spec.max_duration_ms,
+                    "risk": spec.risk,
+                    "pre_conditions": list(spec.pre_conditions),
                 }
                 for skill_id, spec in registry.skills.items()
             },

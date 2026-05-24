@@ -135,9 +135,10 @@ def normalize_tool_calls_to_react_turn(assistant_msg: dict[str, Any]) -> dict[st
 def normalize_legacy_json_to_react_turn(data: dict[str, Any]) -> dict[str, Any]:
     raw_data = dict(data or {})
     if raw_data.get("type") == "finish":
-        final = str(raw_data.get("final") or raw_data.get("message") or "done")
+        final = str(raw_data.get("message") or raw_data.get("final") or "done")
         return {
             "type": "finish",
+            "message": final,
             "final": final,
             "raw_assistant_message": {"role": "assistant", "content": _json_dumps(raw_data)},
             "message_for_history": {"role": "assistant", "content": _json_dumps(raw_data)},

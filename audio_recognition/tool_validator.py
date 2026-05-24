@@ -31,6 +31,26 @@ def _append_validator_error(envelope: DecisionEnvelope, rejected: ToolCall) -> N
     envelope.errors.append({"stage": "validator", "message": rejected.error, "tool_call": rejected.model_dump(), "t": time.time()})
 
 
+def _normalize_args(tool: str, args: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(args)
+    if tool == "camera_snapshot" and "purpose" not in normalized and normalized.get("reason"):
+        normalized["purpose"] = normalized["reason"]
+    if tool == "ask_confirmation":
+        if "timeout_ms" not in normalized and normalized.get("timeout_s") is not None:
+            try:
+                normalized["timeout_ms"] = int(normalized["timeout_s"]) * 1000
+            except (TypeError, ValueError):
+                pass
+        if "timeout_s" not in normalized and normalized.get("timeout_ms") is not None:
+            try:
+                normalized["timeout_s"] = max(1, int(normalized["timeout_ms"]) // 1000)
+            except (TypeError, ValueError):
+                pass
+    if tool == "finish" and "message" not in normalized and normalized.get("final") is not None:
+        normalized["message"] = str(normalized.get("final") or "")
+    return normalized
+
+
 def _validate_duration(skill_id: str, args: dict[str, Any], registry: SkillRegistry) -> tuple[int | None, str]:
     spec = registry.get(skill_id)
     duration = args.get("duration_ms")
@@ -60,7 +80,7 @@ def validate_tool_call(
         _append_validator_error(envelope, _reject(call, "unsupported_tool"))
         return None
 
-    args: dict[str, Any] = dict(call.args)
+    args: dict[str, Any] = _normalize_args(call.tool, dict(call.args))
     wait_until = str(args.get("wait_until") or "completed")
     if wait_until not in {"accepted", "completed"}:
         _append_validator_error(envelope, _reject(call, "invalid_wait_until"))
@@ -68,12 +88,14 @@ def validate_tool_call(
 
     if call.tool == "finish":
         accepted = call.model_copy(deep=True)
+        accepted.args = args
         accepted.status = "validated"
         envelope.validated_tool_calls.append(accepted)
         return None
 
     if call.tool in OBSERVATION_TOOLS:
         accepted = call.model_copy(deep=True)
+        accepted.args = args
         accepted.status = "validated"
         envelope.validated_tool_calls.append(accepted)
         return None

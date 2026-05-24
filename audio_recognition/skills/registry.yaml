@@ -3,16 +3,27 @@ defaults:
   max_action_duration_ms: 1000
   max_turn_duration_ms: 800
   max_face_duration_ms: 5000
+  observation_ttl_ms:
+    camera_snapshot: 2000
+    front_distance: 2000
+    get_robot_state: 5000
+  safety_thresholds:
+    min_front_distance_estimate_cm: 1
 skills:
   - id: emergency_stop
     route: action
     tool: emergency_stop
     max_duration_ms: 0
+    risk: low
     aliases: [stop, e-stop]
   - id: move_forward
     route: action
     tool: dispatch_action
     max_duration_ms: 1000
+    risk: medium
+    pre_conditions:
+      - recent_camera_snapshot
+      - front_distance_clear
     aliases: [forward]
   - id: move_backward
     route: action

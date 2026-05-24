@@ -130,10 +130,10 @@ class AudioRegressionSuite(unittest.TestCase):
         self.assertIsNone(routed["plan"])
 
     def test_execute_planned_task_routes_action(self) -> None:
-        with patch("audio_recognition.react_agent.requests.post", side_effect=[action_response("move_forward", text="前进"), finish_response()]):
+        with patch("audio_recognition.react_agent.requests.post", side_effect=[action_response("turn_left", text="左转"), finish_response()]):
             routed = route_transcript(
                 base_dir=BASE_DIR,
-                text="前进",
+                text="左转",
                 router_config=self.react_router_config,
                 cloud_config={"action_enabled": True, "action_server": "http://action.local"},
                 route_action=False,
@@ -148,7 +148,7 @@ class AudioRegressionSuite(unittest.TestCase):
             )
         create_action_task.assert_called_once()
         self.assertEqual(result["action_task"], {"task": {"id": "t1"}})
-        self.assertEqual(routed["skill_id"], "move_forward")
+        self.assertEqual(routed["skill_id"], "turn_left")
 
     def test_execute_planned_task_routes_face(self) -> None:
         plan = build_task_planner(self.router_config, self.router_config["skill_catalog"]).plan("笑一笑")

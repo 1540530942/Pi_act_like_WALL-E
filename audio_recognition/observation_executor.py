@@ -11,7 +11,7 @@ except ImportError:
     from envelope import DecisionEnvelope, ToolCall
 
 
-OBSERVATION_TOOLS = {"camera_snapshot", "get_robot_state", "ask_confirmation"}
+OBSERVATION_TOOLS = {"camera_snapshot", "front_distance", "get_robot_state", "ask_confirmation"}
 
 
 def _get_json(url: str, timeout: float = 5) -> dict[str, Any]:
@@ -49,11 +49,18 @@ def execute_observation_tool(envelope: DecisionEnvelope, call: ToolCall, cloud_c
             if not camera_server:
                 raise RuntimeError("camera_server is required")
             observation["data"] = _post_json(f"{camera_server}/api/capture", dict(call.args or {}))
+        elif call.tool == "front_distance":
+            sensor_server = str(cloud_config.get("sensor_server") or cloud_config.get("camera_server") or "").rstrip("/")
+            if not sensor_server:
+                raise RuntimeError("sensor_server or camera_server is required")
+            observation["data"] = _get_json(f"{sensor_server}/api/sonar")
         elif call.tool == "ask_confirmation":
             observation["status"] = "pending"
+            timeout_ms = int(call.args.get("timeout_ms") or int(call.args.get("timeout_s") or 10) * 1000)
             observation["data"] = {
                 "question": str(call.args.get("question") or ""),
-                "timeout_s": int(call.args.get("timeout_s") or 10),
+                "timeout_ms": timeout_ms,
+                "timeout_s": max(1, timeout_ms // 1000),
                 "confirmed": False,
                 "answer": None,
                 "timeout": False,

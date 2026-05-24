@@ -20,8 +20,8 @@ except ImportError:
     from tool_schema import build_react_tools_schema, tool_skill_groups
 
 
-DEFAULT_LLM_ENDPOINT = "https://www.wangyutang.cn/common/api/llm/chat"
-DEFAULT_LLM_MODEL = "qwen3.5-9b"
+DEFAULT_LLM_ENDPOINT = "https://www.wangyutang.cn/common/api/llm/qwen3-32b/chat/completions"
+DEFAULT_LLM_MODEL = "qwen3-32b"
 
 
 class LlmReactAgent:
@@ -38,9 +38,28 @@ class LlmReactAgent:
         self.verify_ssl = bool(llm_config.get("verify_ssl", True))
         self.retries = int(llm_config.get("retries") or os.getenv("AUDIO_REACT_LLM_RETRIES") or 2)
         self.use_response_format = bool(llm_config.get("response_format_json") or os.getenv("AUDIO_REACT_LLM_RESPONSE_FORMAT_JSON"))
+        self.prompt_path = self._resolve_prompt_path(agent_config)
         self.last_decision: dict[str, Any] = {}
         if not self.endpoint or not self.model:
             raise RuntimeError("react_agent.llm.endpoint and model are required")
+
+    def _resolve_prompt_path(self, agent_config: dict[str, Any]) -> Path:
+        raw_path = agent_config.get("prompt_path") or os.getenv("AUDIO_REACT_SYSTEM_PROMPT") or "prompts/walle_system_prompt.md"
+        prompt_path = Path(str(raw_path))
+        if not prompt_path.is_absolute():
+            prompt_path = (self.base_dir / prompt_path).resolve()
+        return prompt_path
+
+    def _persona_prompt(self) -> str:
+        if self.prompt_path.exists():
+            text = self.prompt_path.read_text(encoding="utf-8").strip()
+            if text:
+                return text
+        return (
+            "You are WALL-E, the robot control brain. Use native tool_calls when available. "
+            "One ReAct turn equals one tool_call. Observe before acting when current state is required. "
+            "Execute only positive requested actions; negated fragments do not create actions."
+        )
 
     def _system_prompt(self) -> str:
         groups = tool_skill_groups(self.registry_path, self.catalog_path)
@@ -48,6 +67,7 @@ class LlmReactAgent:
             "dispatch_action": groups["action"],
             "dispatch_face": groups["face"],
             "camera_snapshot": ["camera_snapshot"],
+            "front_distance": ["front_distance"],
             "get_robot_state": ["get_robot_state"],
             "ask_confirmation": ["ask_confirmation"],
             "emergency_stop": ["emergency_stop"],
@@ -69,15 +89,17 @@ class LlmReactAgent:
             "final": "only for finish",
         }
         return (
-            "Prefer native OpenAI-style tool_calls. If native tool calling is unavailable, output only compact JSON. "
-            "protocol_version=react_v1_single_tool. No Thinking Process. One ReAct turn equals one tool_call. "
-            "After a completed/dry_run tool result, choose the next unfinished positive command; output finish when done. "
-            "Negated fragments such as \u4e0d\u8981/\u522b/\u4e0d\u8bb8/\u4e0d\u7528 do not create that action and do not cancel previous completed actions. "
-            "\u505c\u6b62/\u6025\u505c/\u522b\u52a8/\u4e0d\u8981\u52a8 -> emergency_stop. "
-            "\u5f80\u524d\u8d70=move_forward; \u5f80\u540e\u8d70=move_backward; \u62ac\u5934\u770b=look_up; \u4f4e\u5934\u770b=look_down. "
-            "tool_call.args.text must be the minimal source fragment for only this step. "
-            "Observation tools must be used before action when current state or camera evidence is required. "
-            f"Allowed: {json.dumps(allowed, ensure_ascii=False)}. "
+            f"{self._persona_prompt()}\n\n"
+            "Runtime protocol:\n"
+            "- Prefer native OpenAI-style tool_calls. If native tool calling is unavailable, output only compact JSON.\n"
+            "- protocol_version=react_v1_single_tool. No Thinking Process. One ReAct turn equals one tool_call.\n"
+            "- After a completed/dry_run tool result, choose the next unfinished positive command; output finish when done.\n"
+            "- Negated fragments such as \u4e0d\u8981/\u522b/\u4e0d\u8bb8/\u4e0d\u7528 do not create that action and do not cancel previous completed actions.\n"
+            "- \u505c\u6b62/\u6025\u505c/\u522b\u52a8/\u4e0d\u8981\u52a8 -> emergency_stop.\n"
+            "- \u5f80\u524d\u8d70=move_forward; \u5f80\u540e\u8d70=move_backward; \u62ac\u5934\u770b=look_up; \u4f4e\u5934\u770b=look_down.\n"
+            "- tool_call.args.text must be the minimal source fragment for only this step.\n"
+            "- Use front_distance before forward motion when front clearance matters; use camera_snapshot when visual scene evidence is required.\n"
+            f"Allowed: {json.dumps(allowed, ensure_ascii=False)}.\n"
             f"Schema: {json.dumps(schema, ensure_ascii=False)}."
         )
 
@@ -171,7 +193,8 @@ class LlmReactAgent:
             error = data.get("error") if isinstance(data.get("error"), dict) else {}
             raise ValueError(str(error.get("message") or "LLM output is invalid"))
         if data.get("type") == "finish":
-            return ToolCall(tool="finish", args={"final": data.get("final", "done"), "order": turn, "wait_until": "completed", "confidence": 1.0})
+            message = str(data.get("message") or data.get("final") or "done")
+            return ToolCall(tool="finish", args={"message": message, "final": message, "order": turn, "wait_until": "completed", "confidence": 1.0})
         item = data.get("tool_call")
         if data.get("type") == "tool_call" and isinstance(item, dict):
             item = {"tool": item.get("tool") or item.get("name"), "args": item.get("args") or item.get("arguments") or {}}

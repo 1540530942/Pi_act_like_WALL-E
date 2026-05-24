@@ -42,9 +42,10 @@
     "react_agent": {
       "mode": "llm",
       "max_steps": 8,
+      "prompt_path": "prompts/walle_system_prompt.md",
       "llm": {
-        "endpoint": "https://www.wangyutang.cn/common/api/llm/chat",
-        "model": "qwen3.5-9b",
+        "endpoint": "https://www.wangyutang.cn/common/api/llm/qwen3-32b/chat/completions",
+        "model": "qwen3-32b",
         "timeout_seconds": 90,
         "retries": 2
       }
