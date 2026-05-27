@@ -1,0 +1,3202 @@
+[
+  {
+    "device_id": "verify",
+    "text": "眨眨眼",
+    "wav_path": "",
+    "skill_id": "face_blink",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_blink",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "眨眨眼",
+        "metadata": {
+          "aliases": [
+            "眨眼",
+            "眨眨眼",
+            "眨一下眼睛"
+          ],
+          "name_zh": "眨眼"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295651.7503877
+  },
+  {
+    "device_id": "verify",
+    "text": "表情复位",
+    "wav_path": "",
+    "skill_id": "face_reset",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_reset",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "表情复位",
+        "metadata": {
+          "aliases": [
+            "恢复表情",
+            "表情复位",
+            "脸部复位"
+          ],
+          "name_zh": "恢复表情"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295651.7629468
+  },
+  {
+    "device_id": "verify",
+    "text": "您的指令已经完成了",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295651.7768826
+  },
+  {
+    "device_id": "verify",
+    "text": "今天上海天气怎么样",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295651.7889557
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295670.6390603
+  },
+  {
+    "device_id": "verify",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "asr": {
+        "text": "前进",
+        "fixture": "move_forward_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "前进",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.6552112
+  },
+  {
+    "device_id": "verify",
+    "text": "往前走",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "asr": {
+        "text": "往前走",
+        "fixture": "move_forward_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往前走",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.668747
+  },
+  {
+    "device_id": "verify",
+    "text": "后退",
+    "wav_path": "",
+    "skill_id": "move_backward",
+    "raw": {
+      "asr": {
+        "text": "后退",
+        "fixture": "move_backward_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "后退",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.680429
+  },
+  {
+    "device_id": "verify",
+    "text": "往后走",
+    "wav_path": "",
+    "skill_id": "move_backward",
+    "raw": {
+      "asr": {
+        "text": "往后走",
+        "fixture": "move_backward_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往后走",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.693104
+  },
+  {
+    "device_id": "verify",
+    "text": "左移",
+    "wav_path": "",
+    "skill_id": "move_left",
+    "raw": {
+      "asr": {
+        "text": "左移",
+        "fixture": "move_left_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.7056286
+  },
+  {
+    "device_id": "verify",
+    "text": "向左平移",
+    "wav_path": "",
+    "skill_id": "move_left",
+    "raw": {
+      "asr": {
+        "text": "向左平移",
+        "fixture": "move_left_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左平移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.717665
+  },
+  {
+    "device_id": "verify",
+    "text": "右移",
+    "wav_path": "",
+    "skill_id": "move_right",
+    "raw": {
+      "asr": {
+        "text": "右移",
+        "fixture": "move_right_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.729366
+  },
+  {
+    "device_id": "verify",
+    "text": "向右平移",
+    "wav_path": "",
+    "skill_id": "move_right",
+    "raw": {
+      "asr": {
+        "text": "向右平移",
+        "fixture": "move_right_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右平移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.7419853
+  },
+  {
+    "device_id": "verify",
+    "text": "左转",
+    "wav_path": "",
+    "skill_id": "turn_left",
+    "raw": {
+      "asr": {
+        "text": "左转",
+        "fixture": "turn_left_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.7565324
+  },
+  {
+    "device_id": "verify",
+    "text": "向左旋转",
+    "wav_path": "",
+    "skill_id": "turn_left",
+    "raw": {
+      "asr": {
+        "text": "向左旋转",
+        "fixture": "turn_left_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左旋转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.7707777
+  },
+  {
+    "device_id": "verify",
+    "text": "右转",
+    "wav_path": "",
+    "skill_id": "turn_right",
+    "raw": {
+      "asr": {
+        "text": "右转",
+        "fixture": "turn_right_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.7846398
+  },
+  {
+    "device_id": "verify",
+    "text": "向右旋转",
+    "wav_path": "",
+    "skill_id": "turn_right",
+    "raw": {
+      "asr": {
+        "text": "向右旋转",
+        "fixture": "turn_right_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右旋转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.8014565
+  },
+  {
+    "device_id": "verify",
+    "text": "向左看",
+    "wav_path": "",
+    "skill_id": "look_left",
+    "raw": {
+      "asr": {
+        "text": "向左看",
+        "fixture": "look_left_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左看",
+        "metadata": {
+          "aliases": [
+            "向左看",
+            "左看",
+            "看左边",
+            "摄像头向左",
+            "镜头向左"
+          ],
+          "name_zh": "向左看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.8199253
+  },
+  {
+    "device_id": "verify",
+    "text": "向右看",
+    "wav_path": "",
+    "skill_id": "look_right",
+    "raw": {
+      "asr": {
+        "text": "向右看",
+        "fixture": "look_right_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右看",
+        "metadata": {
+          "aliases": [
+            "向右看",
+            "右看",
+            "看右边",
+            "摄像头向右",
+            "镜头向右"
+          ],
+          "name_zh": "向右看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.8367443
+  },
+  {
+    "device_id": "verify",
+    "text": "向上看",
+    "wav_path": "",
+    "skill_id": "look_up",
+    "raw": {
+      "asr": {
+        "text": "向上看",
+        "fixture": "look_up_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_up",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向上看",
+        "metadata": {
+          "aliases": [
+            "向上看",
+            "上看",
+            "看上面",
+            "摄像头向上",
+            "镜头向上"
+          ],
+          "name_zh": "向上看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.8531191
+  },
+  {
+    "device_id": "verify",
+    "text": "向下看",
+    "wav_path": "",
+    "skill_id": "look_down",
+    "raw": {
+      "asr": {
+        "text": "向下看",
+        "fixture": "look_down_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_down",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向下看",
+        "metadata": {
+          "aliases": [
+            "向下看",
+            "下看",
+            "看下面",
+            "摄像头向下",
+            "镜头向下"
+          ],
+          "name_zh": "向下看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.8666022
+  },
+  {
+    "device_id": "verify",
+    "text": "复位",
+    "wav_path": "",
+    "skill_id": "reset_pose",
+    "raw": {
+      "asr": {
+        "text": "复位",
+        "fixture": "reset_pose_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "reset_pose",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "复位",
+        "metadata": {
+          "aliases": [
+            "复位",
+            "回正",
+            "重置",
+            "恢复默认",
+            "reset"
+          ],
+          "name_zh": "复位"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.879249
+  },
+  {
+    "device_id": "verify",
+    "text": "急停",
+    "wav_path": "",
+    "skill_id": "emergency_stop",
+    "raw": {
+      "asr": {
+        "text": "急停",
+        "fixture": "emergency_stop_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "急停",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.8917134
+  },
+  {
+    "device_id": "verify",
+    "text": "stop",
+    "wav_path": "",
+    "skill_id": "emergency_stop",
+    "raw": {
+      "asr": {
+        "text": "stop",
+        "fixture": "emergency_stop_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "stop",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9062076
+  },
+  {
+    "device_id": "verify",
+    "text": "笑一笑",
+    "wav_path": "",
+    "skill_id": "face_happy",
+    "raw": {
+      "asr": {
+        "text": "笑一笑",
+        "fixture": "face_happy_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_happy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "笑一笑",
+        "metadata": {
+          "aliases": [
+            "笑一笑",
+            "微笑",
+            "开心一点",
+            "高兴一点"
+          ],
+          "name_zh": "笑一笑"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9220364
+  },
+  {
+    "device_id": "verify",
+    "text": "超开心",
+    "wav_path": "",
+    "skill_id": "face_joy",
+    "raw": {
+      "asr": {
+        "text": "超开心",
+        "fixture": "face_joy_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_joy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "超开心",
+        "metadata": {
+          "aliases": [
+            "超开心",
+            "快乐一点",
+            "乐一乐",
+            "星星眼"
+          ],
+          "name_zh": "超开心"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9340324
+  },
+  {
+    "device_id": "verify",
+    "text": "委屈一下",
+    "wav_path": "",
+    "skill_id": "face_sad",
+    "raw": {
+      "asr": {
+        "text": "委屈一下",
+        "fixture": "face_sad_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_sad",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "委屈一下",
+        "metadata": {
+          "aliases": [
+            "难过一点",
+            "伤心一点",
+            "委屈一下"
+          ],
+          "name_zh": "难过一点"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.945919
+  },
+  {
+    "device_id": "verify",
+    "text": "生气一点",
+    "wav_path": "",
+    "skill_id": "face_angry",
+    "raw": {
+      "asr": {
+        "text": "生气一点",
+        "fixture": "face_angry_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_angry",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "生气一点",
+        "metadata": {
+          "aliases": [
+            "生气一点",
+            "凶一点",
+            "发火一下"
+          ],
+          "name_zh": "生气一点"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9578629
+  },
+  {
+    "device_id": "verify",
+    "text": "说句话",
+    "wav_path": "",
+    "skill_id": "face_speak",
+    "raw": {
+      "asr": {
+        "text": "说句话",
+        "fixture": "face_speak_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_speak",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "说句话",
+        "metadata": {
+          "aliases": [
+            "说话",
+            "说句话",
+            "讲话",
+            "动动嘴"
+          ],
+          "name_zh": "说话"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9697044
+  },
+  {
+    "device_id": "verify",
+    "text": "眨眨眼",
+    "wav_path": "",
+    "skill_id": "face_blink",
+    "raw": {
+      "asr": {
+        "text": "眨眨眼",
+        "fixture": "face_blink_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_blink",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "眨眨眼",
+        "metadata": {
+          "aliases": [
+            "眨眼",
+            "眨眨眼",
+            "眨一下眼睛"
+          ],
+          "name_zh": "眨眼"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9819174
+  },
+  {
+    "device_id": "verify",
+    "text": "表情复位",
+    "wav_path": "",
+    "skill_id": "face_reset",
+    "raw": {
+      "asr": {
+        "text": "表情复位",
+        "fixture": "face_reset_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_reset",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "表情复位",
+        "metadata": {
+          "aliases": [
+            "恢复表情",
+            "表情复位",
+            "脸部复位"
+          ],
+          "name_zh": "恢复表情"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779295780.9941573
+  },
+  {
+    "device_id": "verify",
+    "text": "您的指令已经完成了",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "asr": {
+        "text": "您的指令已经完成了",
+        "fixture": "ignored_completion"
+      },
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295781.0056412
+  },
+  {
+    "device_id": "verify",
+    "text": "今天上海天气怎么样",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "asr": {
+        "text": "今天上海天气怎么样",
+        "fixture": "unmatched_text"
+      },
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295781.017462
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779295795.4070687
+  },
+  {
+    "device_id": "verify",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "asr": {
+        "text": "前进",
+        "fixture": "move_forward_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "前进",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.079079
+  },
+  {
+    "device_id": "verify",
+    "text": "往前走",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "asr": {
+        "text": "往前走",
+        "fixture": "move_forward_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往前走",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.0992303
+  },
+  {
+    "device_id": "verify",
+    "text": "后退",
+    "wav_path": "",
+    "skill_id": "move_backward",
+    "raw": {
+      "asr": {
+        "text": "后退",
+        "fixture": "move_backward_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "后退",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.1135697
+  },
+  {
+    "device_id": "verify",
+    "text": "往后走",
+    "wav_path": "",
+    "skill_id": "move_backward",
+    "raw": {
+      "asr": {
+        "text": "往后走",
+        "fixture": "move_backward_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往后走",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.127537
+  },
+  {
+    "device_id": "verify",
+    "text": "左移",
+    "wav_path": "",
+    "skill_id": "move_left",
+    "raw": {
+      "asr": {
+        "text": "左移",
+        "fixture": "move_left_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.142303
+  },
+  {
+    "device_id": "verify",
+    "text": "向左平移",
+    "wav_path": "",
+    "skill_id": "move_left",
+    "raw": {
+      "asr": {
+        "text": "向左平移",
+        "fixture": "move_left_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左平移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.1571078
+  },
+  {
+    "device_id": "verify",
+    "text": "右移",
+    "wav_path": "",
+    "skill_id": "move_right",
+    "raw": {
+      "asr": {
+        "text": "右移",
+        "fixture": "move_right_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.1715708
+  },
+  {
+    "device_id": "verify",
+    "text": "向右平移",
+    "wav_path": "",
+    "skill_id": "move_right",
+    "raw": {
+      "asr": {
+        "text": "向右平移",
+        "fixture": "move_right_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右平移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.1886806
+  },
+  {
+    "device_id": "verify",
+    "text": "左转",
+    "wav_path": "",
+    "skill_id": "turn_left",
+    "raw": {
+      "asr": {
+        "text": "左转",
+        "fixture": "turn_left_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.2085423
+  },
+  {
+    "device_id": "verify",
+    "text": "向左旋转",
+    "wav_path": "",
+    "skill_id": "turn_left",
+    "raw": {
+      "asr": {
+        "text": "向左旋转",
+        "fixture": "turn_left_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左旋转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.2245681
+  },
+  {
+    "device_id": "verify",
+    "text": "右转",
+    "wav_path": "",
+    "skill_id": "turn_right",
+    "raw": {
+      "asr": {
+        "text": "右转",
+        "fixture": "turn_right_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.2396708
+  },
+  {
+    "device_id": "verify",
+    "text": "向右旋转",
+    "wav_path": "",
+    "skill_id": "turn_right",
+    "raw": {
+      "asr": {
+        "text": "向右旋转",
+        "fixture": "turn_right_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右旋转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.2623096
+  },
+  {
+    "device_id": "verify",
+    "text": "向左看",
+    "wav_path": "",
+    "skill_id": "look_left",
+    "raw": {
+      "asr": {
+        "text": "向左看",
+        "fixture": "look_left_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左看",
+        "metadata": {
+          "aliases": [
+            "向左看",
+            "左看",
+            "看左边",
+            "摄像头向左",
+            "镜头向左"
+          ],
+          "name_zh": "向左看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.2781928
+  },
+  {
+    "device_id": "verify",
+    "text": "向右看",
+    "wav_path": "",
+    "skill_id": "look_right",
+    "raw": {
+      "asr": {
+        "text": "向右看",
+        "fixture": "look_right_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右看",
+        "metadata": {
+          "aliases": [
+            "向右看",
+            "右看",
+            "看右边",
+            "摄像头向右",
+            "镜头向右"
+          ],
+          "name_zh": "向右看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.2959628
+  },
+  {
+    "device_id": "verify",
+    "text": "向上看",
+    "wav_path": "",
+    "skill_id": "look_up",
+    "raw": {
+      "asr": {
+        "text": "向上看",
+        "fixture": "look_up_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_up",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向上看",
+        "metadata": {
+          "aliases": [
+            "向上看",
+            "上看",
+            "看上面",
+            "摄像头向上",
+            "镜头向上"
+          ],
+          "name_zh": "向上看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.3168461
+  },
+  {
+    "device_id": "verify",
+    "text": "向下看",
+    "wav_path": "",
+    "skill_id": "look_down",
+    "raw": {
+      "asr": {
+        "text": "向下看",
+        "fixture": "look_down_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "look_down",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向下看",
+        "metadata": {
+          "aliases": [
+            "向下看",
+            "下看",
+            "看下面",
+            "摄像头向下",
+            "镜头向下"
+          ],
+          "name_zh": "向下看"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.3353014
+  },
+  {
+    "device_id": "verify",
+    "text": "复位",
+    "wav_path": "",
+    "skill_id": "reset_pose",
+    "raw": {
+      "asr": {
+        "text": "复位",
+        "fixture": "reset_pose_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "reset_pose",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "复位",
+        "metadata": {
+          "aliases": [
+            "复位",
+            "回正",
+            "重置",
+            "恢复默认",
+            "reset"
+          ],
+          "name_zh": "复位"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.3499029
+  },
+  {
+    "device_id": "verify",
+    "text": "急停",
+    "wav_path": "",
+    "skill_id": "emergency_stop",
+    "raw": {
+      "asr": {
+        "text": "急停",
+        "fixture": "emergency_stop_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "急停",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.3652418
+  },
+  {
+    "device_id": "verify",
+    "text": "stop",
+    "wav_path": "",
+    "skill_id": "emergency_stop",
+    "raw": {
+      "asr": {
+        "text": "stop",
+        "fixture": "emergency_stop_alias"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "stop",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      },
+      "action_task": {
+        "task": {
+          "id": "mock-action"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.380217
+  },
+  {
+    "device_id": "verify",
+    "text": "笑一笑",
+    "wav_path": "",
+    "skill_id": "face_happy",
+    "raw": {
+      "asr": {
+        "text": "笑一笑",
+        "fixture": "face_happy_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_happy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "笑一笑",
+        "metadata": {
+          "aliases": [
+            "笑一笑",
+            "微笑",
+            "开心一点",
+            "高兴一点"
+          ],
+          "name_zh": "笑一笑"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.3959088
+  },
+  {
+    "device_id": "verify",
+    "text": "超开心",
+    "wav_path": "",
+    "skill_id": "face_joy",
+    "raw": {
+      "asr": {
+        "text": "超开心",
+        "fixture": "face_joy_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_joy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "超开心",
+        "metadata": {
+          "aliases": [
+            "超开心",
+            "快乐一点",
+            "乐一乐",
+            "星星眼"
+          ],
+          "name_zh": "超开心"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.4099302
+  },
+  {
+    "device_id": "verify",
+    "text": "委屈一下",
+    "wav_path": "",
+    "skill_id": "face_sad",
+    "raw": {
+      "asr": {
+        "text": "委屈一下",
+        "fixture": "face_sad_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_sad",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "委屈一下",
+        "metadata": {
+          "aliases": [
+            "难过一点",
+            "伤心一点",
+            "委屈一下"
+          ],
+          "name_zh": "难过一点"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.4246366
+  },
+  {
+    "device_id": "verify",
+    "text": "生气一点",
+    "wav_path": "",
+    "skill_id": "face_angry",
+    "raw": {
+      "asr": {
+        "text": "生气一点",
+        "fixture": "face_angry_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_angry",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "生气一点",
+        "metadata": {
+          "aliases": [
+            "生气一点",
+            "凶一点",
+            "发火一下"
+          ],
+          "name_zh": "生气一点"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.441447
+  },
+  {
+    "device_id": "verify",
+    "text": "说句话",
+    "wav_path": "",
+    "skill_id": "face_speak",
+    "raw": {
+      "asr": {
+        "text": "说句话",
+        "fixture": "face_speak_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_speak",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "说句话",
+        "metadata": {
+          "aliases": [
+            "说话",
+            "说句话",
+            "讲话",
+            "动动嘴"
+          ],
+          "name_zh": "说话"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.461428
+  },
+  {
+    "device_id": "verify",
+    "text": "眨眨眼",
+    "wav_path": "",
+    "skill_id": "face_blink",
+    "raw": {
+      "asr": {
+        "text": "眨眨眼",
+        "fixture": "face_blink_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_blink",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "眨眨眼",
+        "metadata": {
+          "aliases": [
+            "眨眼",
+            "眨眨眼",
+            "眨一下眼睛"
+          ],
+          "name_zh": "眨眼"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.4770296
+  },
+  {
+    "device_id": "verify",
+    "text": "表情复位",
+    "wav_path": "",
+    "skill_id": "face_reset",
+    "raw": {
+      "asr": {
+        "text": "表情复位",
+        "fixture": "face_reset_basic"
+      },
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "face_reset",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "表情复位",
+        "metadata": {
+          "aliases": [
+            "恢复表情",
+            "表情复位",
+            "脸部复位"
+          ],
+          "name_zh": "恢复表情"
+        }
+      },
+      "action_task": null,
+      "action_error": "",
+      "face_task": {
+        "state": {
+          "id": "mock-face"
+        }
+      },
+      "face_error": ""
+    },
+    "reported_at": 1779300142.4934971
+  },
+  {
+    "device_id": "verify",
+    "text": "您的指令已经完成了",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "asr": {
+        "text": "您的指令已经完成了",
+        "fixture": "ignored_completion"
+      },
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.5093877
+  },
+  {
+    "device_id": "verify",
+    "text": "今天上海天气怎么样",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "asr": {
+        "text": "今天上海天气怎么样",
+        "fixture": "unmatched_text"
+      },
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300142.5249968
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300159.3021264
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300691.7548552
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779300856.9853284
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779380228.439067
+  },
+  {
+    "device_id": "api-test",
+    "text": "??",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "asr": {
+        "text": "??"
+      },
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779380257.683283
+  },
+  {
+    "device_id": "api-test",
+    "text": "??",
+    "wav_path": "",
+    "skill_id": "",
+    "raw": {
+      "asr": {
+        "text": "??"
+      },
+      "source": "web-recording",
+      "plan": null,
+      "action_task": null,
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779380286.0560648
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779380422.0394201
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779380529.5357943
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779381496.2007487
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779381620.028113
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779382244.9399796
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779382283.7303784
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779387997.0971496
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779449858.5617316
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779449905.3359985
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779450516.3226228
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779450516.3963258
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779453007.8156452
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779454023.1267617
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779454036.7658985
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779454114.487787
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779454133.0714524
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779455301.959451
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779455314.9762099
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779456381.2271006
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779456403.2023416
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779456496.960932
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779456520.028818
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779555624.291028
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779555973.841752
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779562942.643274
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779562991.2757716
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779595520.6352751
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779608923.7684655
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779613486.8856
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779820602.9598882
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779820620.1859233
+  },
+  {
+    "device_id": "test",
+    "text": "前进",
+    "wav_path": "",
+    "skill_id": "move_forward",
+    "raw": {
+      "source": "web-recording",
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      },
+      "action_task": {
+        "task": {
+          "id": "task-1"
+        }
+      },
+      "action_error": "",
+      "face_task": null,
+      "face_error": ""
+    },
+    "reported_at": 1779820734.5218847
+  }
+]

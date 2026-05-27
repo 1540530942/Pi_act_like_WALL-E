@@ -1,0 +1,3488 @@
+[
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_blink",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_blink",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "眨眨眼",
+        "metadata": {
+          "aliases": [
+            "眨眼",
+            "眨眨眼",
+            "眨一下眼睛"
+          ],
+          "name_zh": "眨眼"
+        }
+      }
+    },
+    "reported_at": 1779295651.748209
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "表情复位"
+    },
+    "reported_at": 1779295651.7582948
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_reset",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_reset",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "表情复位",
+        "metadata": {
+          "aliases": [
+            "恢复表情",
+            "表情复位",
+            "脸部复位"
+          ],
+          "name_zh": "恢复表情"
+        }
+      }
+    },
+    "reported_at": 1779295651.760822
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "您的指令已经完成了"
+    },
+    "reported_at": 1779295651.7707992
+  },
+  {
+    "device_id": "verify",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "您的指令已经完成了",
+      "plan": null
+    },
+    "reported_at": 1779295651.7737858
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "今天上海天气怎么样"
+    },
+    "reported_at": 1779295651.784382
+  },
+  {
+    "device_id": "verify",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "今天上海天气怎么样",
+      "plan": null
+    },
+    "reported_at": 1779295651.7868526
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779295670.6341338
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779295670.6367915
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779295780.6502557
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "前进",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      }
+    },
+    "reported_at": 1779295780.6530476
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "往前走"
+    },
+    "reported_at": 1779295780.6637535
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往前走",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      }
+    },
+    "reported_at": 1779295780.6665814
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "后退"
+    },
+    "reported_at": 1779295780.6757834
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_backward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "后退",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      }
+    },
+    "reported_at": 1779295780.6782048
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "往后走"
+    },
+    "reported_at": 1779295780.6880164
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_backward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往后走",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      }
+    },
+    "reported_at": 1779295780.6909122
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "左移"
+    },
+    "reported_at": 1779295780.7010317
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      }
+    },
+    "reported_at": 1779295780.703475
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向左平移"
+    },
+    "reported_at": 1779295780.7128763
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左平移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      }
+    },
+    "reported_at": 1779295780.715382
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "右移"
+    },
+    "reported_at": 1779295780.724279
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      }
+    },
+    "reported_at": 1779295780.7269833
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向右平移"
+    },
+    "reported_at": 1779295780.736843
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右平移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      }
+    },
+    "reported_at": 1779295780.7394917
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "左转"
+    },
+    "reported_at": 1779295780.75172
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      }
+    },
+    "reported_at": 1779295780.7542934
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向左旋转"
+    },
+    "reported_at": 1779295780.7656956
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左旋转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      }
+    },
+    "reported_at": 1779295780.7683551
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "右转"
+    },
+    "reported_at": 1779295780.7782454
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      }
+    },
+    "reported_at": 1779295780.7814085
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向右旋转"
+    },
+    "reported_at": 1779295780.793971
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右旋转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      }
+    },
+    "reported_at": 1779295780.7980175
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向左看"
+    },
+    "reported_at": 1779295780.8113978
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左看",
+        "metadata": {
+          "aliases": [
+            "向左看",
+            "左看",
+            "看左边",
+            "摄像头向左",
+            "镜头向左"
+          ],
+          "name_zh": "向左看"
+        }
+      }
+    },
+    "reported_at": 1779295780.8158011
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向右看"
+    },
+    "reported_at": 1779295780.829821
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右看",
+        "metadata": {
+          "aliases": [
+            "向右看",
+            "右看",
+            "看右边",
+            "摄像头向右",
+            "镜头向右"
+          ],
+          "name_zh": "向右看"
+        }
+      }
+    },
+    "reported_at": 1779295780.8334363
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向上看"
+    },
+    "reported_at": 1779295780.8473778
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_up",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_up",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向上看",
+        "metadata": {
+          "aliases": [
+            "向上看",
+            "上看",
+            "看上面",
+            "摄像头向上",
+            "镜头向上"
+          ],
+          "name_zh": "向上看"
+        }
+      }
+    },
+    "reported_at": 1779295780.8504467
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向下看"
+    },
+    "reported_at": 1779295780.8615465
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_down",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_down",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向下看",
+        "metadata": {
+          "aliases": [
+            "向下看",
+            "下看",
+            "看下面",
+            "摄像头向下",
+            "镜头向下"
+          ],
+          "name_zh": "向下看"
+        }
+      }
+    },
+    "reported_at": 1779295780.8642743
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "复位"
+    },
+    "reported_at": 1779295780.8742418
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action reset_pose",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "reset_pose",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "复位",
+        "metadata": {
+          "aliases": [
+            "复位",
+            "回正",
+            "重置",
+            "恢复默认",
+            "reset"
+          ],
+          "name_zh": "复位"
+        }
+      }
+    },
+    "reported_at": 1779295780.8769362
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "急停"
+    },
+    "reported_at": 1779295780.88657
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action emergency_stop",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "急停",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      }
+    },
+    "reported_at": 1779295780.8892221
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "stop"
+    },
+    "reported_at": 1779295780.898564
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action emergency_stop",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "stop",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      }
+    },
+    "reported_at": 1779295780.9023647
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "笑一笑"
+    },
+    "reported_at": 1779295780.9169164
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_happy",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_happy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "笑一笑",
+        "metadata": {
+          "aliases": [
+            "笑一笑",
+            "微笑",
+            "开心一点",
+            "高兴一点"
+          ],
+          "name_zh": "笑一笑"
+        }
+      }
+    },
+    "reported_at": 1779295780.9197416
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "超开心"
+    },
+    "reported_at": 1779295780.9286482
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_joy",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_joy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "超开心",
+        "metadata": {
+          "aliases": [
+            "超开心",
+            "快乐一点",
+            "乐一乐",
+            "星星眼"
+          ],
+          "name_zh": "超开心"
+        }
+      }
+    },
+    "reported_at": 1779295780.9315908
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "委屈一下"
+    },
+    "reported_at": 1779295780.9411702
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_sad",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_sad",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "委屈一下",
+        "metadata": {
+          "aliases": [
+            "难过一点",
+            "伤心一点",
+            "委屈一下"
+          ],
+          "name_zh": "难过一点"
+        }
+      }
+    },
+    "reported_at": 1779295780.943576
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "生气一点"
+    },
+    "reported_at": 1779295780.95262
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_angry",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_angry",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "生气一点",
+        "metadata": {
+          "aliases": [
+            "生气一点",
+            "凶一点",
+            "发火一下"
+          ],
+          "name_zh": "生气一点"
+        }
+      }
+    },
+    "reported_at": 1779295780.9552188
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "说句话"
+    },
+    "reported_at": 1779295780.9648082
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_speak",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_speak",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "说句话",
+        "metadata": {
+          "aliases": [
+            "说话",
+            "说句话",
+            "讲话",
+            "动动嘴"
+          ],
+          "name_zh": "说话"
+        }
+      }
+    },
+    "reported_at": 1779295780.9673958
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "眨眨眼"
+    },
+    "reported_at": 1779295780.9767215
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_blink",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_blink",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "眨眨眼",
+        "metadata": {
+          "aliases": [
+            "眨眼",
+            "眨眨眼",
+            "眨一下眼睛"
+          ],
+          "name_zh": "眨眼"
+        }
+      }
+    },
+    "reported_at": 1779295780.9796524
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "表情复位"
+    },
+    "reported_at": 1779295780.9890747
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_reset",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_reset",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "表情复位",
+        "metadata": {
+          "aliases": [
+            "恢复表情",
+            "表情复位",
+            "脸部复位"
+          ],
+          "name_zh": "恢复表情"
+        }
+      }
+    },
+    "reported_at": 1779295780.9917126
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "您的指令已经完成了"
+    },
+    "reported_at": 1779295781.0009036
+  },
+  {
+    "device_id": "verify",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "您的指令已经完成了",
+      "plan": null
+    },
+    "reported_at": 1779295781.0033312
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "今天上海天气怎么样"
+    },
+    "reported_at": 1779295781.012399
+  },
+  {
+    "device_id": "verify",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "今天上海天气怎么样",
+      "plan": null
+    },
+    "reported_at": 1779295781.0151415
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779295795.401636
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779295795.4045386
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779300142.0731816
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "前进",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      }
+    },
+    "reported_at": 1779300142.0762985
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "往前走"
+    },
+    "reported_at": 1779300142.0902076
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往前走",
+        "metadata": {
+          "aliases": [
+            "前进",
+            "向前走",
+            "往前走",
+            "向前移动",
+            "往前移动",
+            "朝前走",
+            "小车前进",
+            "车子前进",
+            "go forward",
+            "forward"
+          ],
+          "name_zh": "前进"
+        }
+      }
+    },
+    "reported_at": 1779300142.0948129
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "后退"
+    },
+    "reported_at": 1779300142.1064897
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_backward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "后退",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      }
+    },
+    "reported_at": 1779300142.109357
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "往后走"
+    },
+    "reported_at": 1779300142.1213353
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_backward",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_backward",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "往后走",
+        "metadata": {
+          "aliases": [
+            "后退",
+            "向后退",
+            "往后退",
+            "向后走",
+            "往后走",
+            "倒退",
+            "小车后退",
+            "车子后退",
+            "backward",
+            "back"
+          ],
+          "name_zh": "后退"
+        }
+      }
+    },
+    "reported_at": 1779300142.1244967
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "左移"
+    },
+    "reported_at": 1779300142.1356943
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      }
+    },
+    "reported_at": 1779300142.1391988
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向左平移"
+    },
+    "reported_at": 1779300142.1514604
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左平移",
+        "metadata": {
+          "aliases": [
+            "左移",
+            "向左移",
+            "往左移",
+            "向左平移",
+            "往左平移",
+            "向左走",
+            "往左走",
+            "左平移",
+            "move left",
+            "strafe left"
+          ],
+          "name_zh": "左移"
+        }
+      }
+    },
+    "reported_at": 1779300142.1544535
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "右移"
+    },
+    "reported_at": 1779300142.1658542
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      }
+    },
+    "reported_at": 1779300142.1688817
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向右平移"
+    },
+    "reported_at": 1779300142.1819174
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "move_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右平移",
+        "metadata": {
+          "aliases": [
+            "右移",
+            "向右移",
+            "往右移",
+            "向右平移",
+            "往右平移",
+            "向右走",
+            "往右走",
+            "右平移",
+            "move right",
+            "strafe right"
+          ],
+          "name_zh": "右移"
+        }
+      }
+    },
+    "reported_at": 1779300142.1856081
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "左转"
+    },
+    "reported_at": 1779300142.2002602
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "左转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      }
+    },
+    "reported_at": 1779300142.204175
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向左旋转"
+    },
+    "reported_at": 1779300142.2180576
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左旋转",
+        "metadata": {
+          "aliases": [
+            "左转",
+            "向左转",
+            "往左转",
+            "朝左转",
+            "原地左转",
+            "左旋转",
+            "turn left"
+          ],
+          "name_zh": "左转"
+        }
+      }
+    },
+    "reported_at": 1779300142.2217581
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "右转"
+    },
+    "reported_at": 1779300142.2327096
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "右转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      }
+    },
+    "reported_at": 1779300142.2364519
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向右旋转"
+    },
+    "reported_at": 1779300142.2484243
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action turn_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "turn_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右旋转",
+        "metadata": {
+          "aliases": [
+            "右转",
+            "向右转",
+            "往右转",
+            "朝右转",
+            "原地右转",
+            "右旋转",
+            "turn right"
+          ],
+          "name_zh": "右转"
+        }
+      }
+    },
+    "reported_at": 1779300142.257574
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向左看"
+    },
+    "reported_at": 1779300142.2709858
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_left",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_left",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向左看",
+        "metadata": {
+          "aliases": [
+            "向左看",
+            "左看",
+            "看左边",
+            "摄像头向左",
+            "镜头向左"
+          ],
+          "name_zh": "向左看"
+        }
+      }
+    },
+    "reported_at": 1779300142.2745373
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向右看"
+    },
+    "reported_at": 1779300142.2883625
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_right",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_right",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向右看",
+        "metadata": {
+          "aliases": [
+            "向右看",
+            "右看",
+            "看右边",
+            "摄像头向右",
+            "镜头向右"
+          ],
+          "name_zh": "向右看"
+        }
+      }
+    },
+    "reported_at": 1779300142.2917511
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向上看"
+    },
+    "reported_at": 1779300142.3080506
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_up",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_up",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向上看",
+        "metadata": {
+          "aliases": [
+            "向上看",
+            "上看",
+            "看上面",
+            "摄像头向上",
+            "镜头向上"
+          ],
+          "name_zh": "向上看"
+        }
+      }
+    },
+    "reported_at": 1779300142.3129485
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "向下看"
+    },
+    "reported_at": 1779300142.327806
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action look_down",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "look_down",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "向下看",
+        "metadata": {
+          "aliases": [
+            "向下看",
+            "下看",
+            "看下面",
+            "摄像头向下",
+            "镜头向下"
+          ],
+          "name_zh": "向下看"
+        }
+      }
+    },
+    "reported_at": 1779300142.3319223
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "复位"
+    },
+    "reported_at": 1779300142.3431578
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action reset_pose",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "reset_pose",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "复位",
+        "metadata": {
+          "aliases": [
+            "复位",
+            "回正",
+            "重置",
+            "恢复默认",
+            "reset"
+          ],
+          "name_zh": "复位"
+        }
+      }
+    },
+    "reported_at": 1779300142.3466437
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "急停"
+    },
+    "reported_at": 1779300142.3578725
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action emergency_stop",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "急停",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      }
+    },
+    "reported_at": 1779300142.3614464
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "stop"
+    },
+    "reported_at": 1779300142.3736465
+  },
+  {
+    "device_id": "verify",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action emergency_stop",
+    "details": {
+      "task": {
+        "id": "mock-action"
+      },
+      "plan": {
+        "skill_id": "emergency_stop",
+        "route": "action",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "stop",
+        "metadata": {
+          "aliases": [
+            "急停",
+            "停止",
+            "停下",
+            "停车",
+            "刹车",
+            "不要动",
+            "别动",
+            "stop",
+            "e-stop"
+          ],
+          "name_zh": "急停"
+        }
+      }
+    },
+    "reported_at": 1779300142.3771873
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "笑一笑"
+    },
+    "reported_at": 1779300142.389674
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_happy",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_happy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "笑一笑",
+        "metadata": {
+          "aliases": [
+            "笑一笑",
+            "微笑",
+            "开心一点",
+            "高兴一点"
+          ],
+          "name_zh": "笑一笑"
+        }
+      }
+    },
+    "reported_at": 1779300142.3931544
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "超开心"
+    },
+    "reported_at": 1779300142.4041739
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_joy",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_joy",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "超开心",
+        "metadata": {
+          "aliases": [
+            "超开心",
+            "快乐一点",
+            "乐一乐",
+            "星星眼"
+          ],
+          "name_zh": "超开心"
+        }
+      }
+    },
+    "reported_at": 1779300142.407281
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "委屈一下"
+    },
+    "reported_at": 1779300142.4179418
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_sad",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_sad",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "委屈一下",
+        "metadata": {
+          "aliases": [
+            "难过一点",
+            "伤心一点",
+            "委屈一下"
+          ],
+          "name_zh": "难过一点"
+        }
+      }
+    },
+    "reported_at": 1779300142.421323
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "生气一点"
+    },
+    "reported_at": 1779300142.4340715
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_angry",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_angry",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "生气一点",
+        "metadata": {
+          "aliases": [
+            "生气一点",
+            "凶一点",
+            "发火一下"
+          ],
+          "name_zh": "生气一点"
+        }
+      }
+    },
+    "reported_at": 1779300142.4380662
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "说句话"
+    },
+    "reported_at": 1779300142.454085
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_speak",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_speak",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "说句话",
+        "metadata": {
+          "aliases": [
+            "说话",
+            "说句话",
+            "讲话",
+            "动动嘴"
+          ],
+          "name_zh": "说话"
+        }
+      }
+    },
+    "reported_at": 1779300142.458213
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "眨眨眼"
+    },
+    "reported_at": 1779300142.4704418
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_blink",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_blink",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "眨眨眼",
+        "metadata": {
+          "aliases": [
+            "眨眼",
+            "眨眨眼",
+            "眨一下眼睛"
+          ],
+          "name_zh": "眨眼"
+        }
+      }
+    },
+    "reported_at": 1779300142.4740355
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "表情复位"
+    },
+    "reported_at": 1779300142.4864197
+  },
+  {
+    "device_id": "verify",
+    "stage": "face_route",
+    "status": "ok",
+    "message": "routed text to face face_reset",
+    "details": {
+      "state": {
+        "id": "mock-face"
+      },
+      "plan": {
+        "skill_id": "face_reset",
+        "route": "face",
+        "planner": "rule",
+        "confidence": 1.0,
+        "transcript": "表情复位",
+        "metadata": {
+          "aliases": [
+            "恢复表情",
+            "表情复位",
+            "脸部复位"
+          ],
+          "name_zh": "恢复表情"
+        }
+      }
+    },
+    "reported_at": 1779300142.490539
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "您的指令已经完成了"
+    },
+    "reported_at": 1779300142.5029001
+  },
+  {
+    "device_id": "verify",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "您的指令已经完成了",
+      "plan": null
+    },
+    "reported_at": 1779300142.5062757
+  },
+  {
+    "device_id": "verify",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "今天上海天气怎么样"
+    },
+    "reported_at": 1779300142.51803
+  },
+  {
+    "device_id": "verify",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "今天上海天气怎么样",
+      "plan": null
+    },
+    "reported_at": 1779300142.5219772
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779300159.2960732
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779300159.299077
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779300691.7490075
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779300691.7523968
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779300856.9796662
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779300856.9827352
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779380228.4326231
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779380228.4361398
+  },
+  {
+    "device_id": "api-test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "??"
+    },
+    "reported_at": 1779380257.6763017
+  },
+  {
+    "device_id": "api-test",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "??",
+      "plan": null
+    },
+    "reported_at": 1779380257.6804364
+  },
+  {
+    "device_id": "api-test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "??"
+    },
+    "reported_at": 1779380286.0491295
+  },
+  {
+    "device_id": "api-test",
+    "stage": "skill_route",
+    "status": "skipped",
+    "message": "no matching voice skill",
+    "details": {
+      "text": "??",
+      "plan": null
+    },
+    "reported_at": 1779380286.0532184
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779380422.0332642
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779380422.0364645
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779380529.52677
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779380529.531419
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779381496.1936097
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779381496.197074
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779381620.0213957
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779381620.0254176
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779382244.934472
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779382244.937397
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779382283.7243223
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779382283.7274802
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779387997.08971
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779387997.0943553
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779449858.5557058
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779449858.5588531
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779449905.3280804
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779449905.3323736
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779450516.3165634
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779450516.3198712
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779450516.3895864
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779450516.3930678
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779453007.8086722
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779453007.812102
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779454023.1188455
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779454023.1224084
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779454036.757205
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779454036.7630847
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779454114.479791
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779454114.4851382
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779454133.0640006
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779454133.0676608
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779455301.9527013
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779455301.9560082
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779455314.970167
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779455314.9736161
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779456381.2207665
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779456381.2243228
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779456403.193851
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779456403.1983192
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779456496.9549212
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779456496.9582186
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779456520.022703
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779456520.0259607
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779555624.267357
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779555624.278794
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779555973.8177736
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779555973.8298225
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779562942.6206124
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779562942.6324532
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779562991.253184
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779562991.2640176
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779595520.5718803
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779595520.6056106
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779608923.6627064
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779608923.7126095
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779613486.8788319
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779613486.8826334
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779820569.1514437
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779820602.937001
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779820602.950033
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779820620.1640725
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779820620.1753004
+  },
+  {
+    "device_id": "test",
+    "stage": "model_asr",
+    "status": "ok",
+    "message": "recognized text received from real ASR API",
+    "details": {
+      "source": "web-recording",
+      "text": "前进"
+    },
+    "reported_at": 1779820734.486977
+  },
+  {
+    "device_id": "test",
+    "stage": "action_route",
+    "status": "ok",
+    "message": "routed text to action move_forward",
+    "details": {
+      "task": {
+        "id": "task-1"
+      },
+      "plan": {
+        "skill_id": "move_forward",
+        "route": "action",
+        "planner": "rule"
+      }
+    },
+    "reported_at": 1779820734.504901
+  }
+]

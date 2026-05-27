@@ -1,5 +1,0 @@
-__pycache__/
-*.py[cod]
-*.log
-*.err.log
-audio_recognition/data/
