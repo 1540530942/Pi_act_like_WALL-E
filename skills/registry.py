@@ -22,7 +22,7 @@ DEFAULT_REGISTRY_DEFAULTS: dict[str, Any] = {
     "max_turn_duration_ms": 800,
     "max_face_duration_ms": 5000,
     "observation_ttl_ms": {"camera_snapshot": 2000, "front_distance": 2000, "get_robot_state": 5000},
-    "safety_thresholds": {"min_front_distance_estimate_cm": 1},
+    "safety_thresholds": {"min_front_distance_estimate_cm": 15},
 }
 
 

@@ -209,7 +209,7 @@ class ReactPipelineTest(unittest.TestCase):
         forward = registry.get("move_forward")
         self.assertIsNotNone(forward)
         self.assertEqual(registry.defaults["observation_ttl_ms"]["camera_snapshot"], 2000)
-        self.assertEqual(registry.defaults["safety_thresholds"]["min_front_distance_estimate_cm"], 1)
+        self.assertEqual(registry.defaults["safety_thresholds"]["min_front_distance_estimate_cm"], 15)
         self.assertEqual(forward.risk, "medium")
         self.assertIn("recent_camera_snapshot", forward.pre_conditions)
         self.assertIn("front_distance_clear", forward.pre_conditions)
@@ -328,7 +328,7 @@ class ReactPipelineTest(unittest.TestCase):
         self.assertEqual(envelope.dispatch_results[0]["status"], "rejected")
         self.assertEqual(envelope.safety_result["reason"], "front_distance_too_close")
         self.assertEqual(envelope.safety_result["observed_value"], 1.0)
-        self.assertEqual(envelope.safety_result["threshold_cm"], 1)
+        self.assertEqual(envelope.safety_result["threshold_cm"], 15)
 
     def test_move_forward_allows_when_front_distance_clear(self) -> None:
         with patch(

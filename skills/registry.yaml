@@ -8,7 +8,7 @@ defaults:
     front_distance: 2000
     get_robot_state: 5000
   safety_thresholds:
-    min_front_distance_estimate_cm: 1
+    min_front_distance_estimate_cm: 15
 skills:
   - id: emergency_stop
     route: action
